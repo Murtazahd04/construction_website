@@ -18,4 +18,8 @@ router.get('/contractors', projectController.getAvailableContractors);
 // GET /api/projects/list - List projects for the PM Dashboard
 router.get('/list', projectController.getMyProjects);
 
+// Add this route
+router.get('/owner/list', projectController.getOwnerProjects);
+// Add this route
+router.get('/:projectId/team', projectController.getProjectTeam);
 module.exports = router;

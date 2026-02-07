@@ -1,21 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react'; // Added useEffect
 import { useDispatch, useSelector } from 'react-redux';
 import { createSubUser, clearUserState } from '../../features/users/userSlice';
+import { fetchOwnerProjects } from '../../features/projects/projectSlice'; // Import new thunk
 import { logout } from '../../features/auth/authSlice';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import { useNavigate } from 'react-router-dom';
+import { Users, Briefcase, LogOut, PlusCircle, LayoutDashboard } from 'lucide-react';
 
 const OwnerDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
+  // Selectors
   const { loading, error, successMessage, createdCredentials } = useSelector((state) => state.users);
+  const { projects } = useSelector((state) => state.projects); // Get projects from Redux
 
-  const [formData, setFormData] = useState({
-    email: '',
-    role: 'Project Manager', // Default
-    specialization: ''
-  });
+  const [activeView, setActiveView] = useState('dashboard'); 
+  const [formData, setFormData] = useState({ email: '', role: 'Project Manager', specialization: '' });
+
+  // FETCH PROJECTS when switching to Dashboard View
+  useEffect(() => {
+    if (activeView === 'dashboard') {
+      dispatch(fetchOwnerProjects());
+    }
+  }, [dispatch, activeView]);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
@@ -29,92 +38,141 @@ const OwnerDashboard = () => {
     navigate('/login');
   };
 
+  const SidebarItem = ({ icon: Icon, label, viewName }) => (
+    <button
+      onClick={() => setActiveView(viewName)}
+      className={`w-full flex items-center space-x-3 px-6 py-4 text-left transition-all duration-200 border-l-4
+        ${activeView === viewName 
+          ? 'bg-orange-50 border-orange-500 text-orange-700' 
+          : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
+    >
+      <Icon className={`w-5 h-5 ${activeView === viewName ? 'text-orange-600' : 'text-gray-400'}`} />
+      <span className="font-medium">{label}</span>
+    </button>
+  );
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow">
-        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Owner Dashboard</h1>
-          <Button text="Logout" onClick={handleLogout} variant="secondary" />
+    <div className="flex h-screen bg-gray-100">
+      <aside className="w-64 bg-white shadow-xl z-10 flex flex-col">
+        <div className="h-20 flex items-center justify-center border-b border-gray-100">
+          <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center mr-3 shadow-lg">
+            <LayoutDashboard className="text-white w-6 h-6" />
+          </div>
+          <h1 className="text-xl font-bold text-gray-800">Owner Panel</h1>
         </div>
-      </header>
+        <nav className="flex-1 py-6 space-y-1">
+          <SidebarItem icon={Briefcase} label="Active Projects" viewName="dashboard" />
+          <SidebarItem icon={Users} label="Create User" viewName="createUser" />
+        </nav>
+        <div className="p-4 border-t border-gray-100">
+          <button onClick={handleLogout} className="flex items-center space-x-3 px-6 py-3 w-full text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200">
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
+        </div>
+      </aside>
 
-      <main className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="bg-white p-6 rounded-lg shadow mb-6">
-          <h2 className="text-xl font-semibold mb-4">Create New User</h2>
+      <main className="flex-1 overflow-y-auto p-8">
+        <header className="mb-8">
+          <h2 className="text-3xl font-bold text-gray-800">
+            {activeView === 'dashboard' ? 'Project Overview' : 'User Management'}
+          </h2>
+          <p className="text-gray-500 mt-1">
+            {activeView === 'dashboard' ? 'Track all ongoing construction projects.' : 'Add new managers and contractors to your team.'}
+          </p>
+        </header>
+
+        {activeView === 'dashboard' ? (
           
-          {/* Success Message & Credentials Display */}
-          {successMessage && (
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
-              <strong className="font-bold">User Created! </strong>
-              <span className="block sm:inline">{successMessage}</span>
-              {createdCredentials && (
-                <div className="mt-2 text-sm bg-white p-2 rounded border border-green-200">
-                  <p><strong>Email:</strong> {createdCredentials.email}</p>
-                  <p><strong>Password:</strong> {createdCredentials.password}</p>
-                  <p className="text-xs text-gray-500 mt-1">(Please copy these credentials safely)</p>
-                </div>
-              )}
-              <button onClick={() => dispatch(clearUserState())} className="absolute top-0 right-0 px-4 py-3">
-                <span className="text-xl">&times;</span>
-              </button>
-            </div>
-          )}
-
-          {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-
-          <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
+          /* VIEW 1: Active Projects (REAL DATA) */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             
-            {/* Role Selection */}
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">Select Role</label>
-              <select
-                name="role"
-                value={formData.role}
-                onChange={handleChange}
-                className="shadow border rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="Project Manager">Project Manager</option>
-                <option value="Contractor">Contractor</option>
-              </select>
-            </div>
-
-            <Input 
-              label="User Email" 
-              name="email" 
-              type="email" 
-              value={formData.email} 
-              onChange={handleChange} 
-              required 
-            />
-
-            {/* Conditional Input: Specialization (Only for Contractors) */}
-            {formData.role === 'Contractor' && (
-              <div>
-                <label className="block text-gray-700 text-sm font-bold mb-2">Contractor Specialization</label>
-                <select
-                  name="specialization"
-                  value={formData.specialization}
-                  onChange={handleChange}
-                  className="shadow border rounded w-full py-2 px-3 text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">Select Specialization...</option>
-                  <option value="Electrical">Electrical</option>
-                  <option value="Plumbing">Plumbing</option>
-                  <option value="Foundation">Foundation</option>
-                  <option value="Civil">Civil</option>
-                </select>
+            {projects && projects.length > 0 ? (
+              projects.map((project) => (
+                <div key={project.project_id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg transition-shadow duration-300">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="p-2 bg-blue-50 rounded-lg">
+                      <Briefcase className="w-6 h-6 text-blue-600" />
+                    </div>
+                    {/* Status is currently hardcoded or needs a DB field. Using 'Active' for now */}
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                      Active
+                    </span>
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">{project.project_name}</h3>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Budget: ₹{Number(project.budget).toLocaleString()}
+                  </p>
+                  
+                  {/* Progress Bar (Placeholder until we have task tracking) */}
+                  <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                    <div className="bg-orange-500 h-2.5 rounded-full" style={{ width: '0%' }}></div>
+                  </div>
+                  <div className="text-right text-xs text-gray-500">Project Started</div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-10 text-gray-500">
+                No projects found. Ask your Project Managers to create one.
               </div>
             )}
+            
+          </div>
 
-            <Button 
-              text={loading ? 'Creating...' : 'Create User'} 
-              type="submit" 
-              variant="primary" 
-              disabled={loading}
-            />
-          </form>
-        </div>
+        ) : (
+          /* VIEW 2: Create User Form (Existing code remains same) */
+          <div className="max-w-2xl">
+            <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
+              {/* ... (Existing Form Code) ... */}
+              <div className="flex items-center mb-6">
+                <div className="p-3 bg-orange-100 rounded-full mr-4">
+                  <Users className="w-6 h-6 text-orange-600" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900">Create New Account</h3>
+                  <p className="text-sm text-gray-500">Generate credentials for your team members.</p>
+                </div>
+              </div>
+
+              {successMessage && (
+                <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r shadow-sm relative">
+                  <p className="text-sm text-green-700 font-bold">{successMessage}</p>
+                  {createdCredentials && (
+                    <div className="mt-2 text-sm bg-white p-3 rounded border border-green-200">
+                       <p><strong>Email:</strong> {createdCredentials.email}</p>
+                       <p><strong>Password:</strong> {createdCredentials.password}</p>
+                    </div>
+                  )}
+                  <button onClick={() => dispatch(clearUserState())} className="absolute top-0 right-0 p-2">&times;</button>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Select Role</label>
+                  <select name="role" value={formData.role} onChange={handleChange} className="block w-full p-3 border rounded-lg bg-gray-50">
+                    <option value="Project Manager">Project Manager</option>
+                    <option value="Contractor">Contractor</option>
+                  </select>
+                </div>
+                <Input label="User Email" name="email" type="email" value={formData.email} onChange={handleChange} required />
+                {formData.role === 'Contractor' && (
+                  <div>
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Specialization</label>
+                    <select name="specialization" value={formData.specialization} onChange={handleChange} className="block w-full p-3 border rounded-lg bg-gray-50">
+                      <option value="">Select...</option>
+                      <option value="Electrical">Electrical</option>
+                      <option value="Plumbing">Plumbing</option>
+                      <option value="Foundation">Foundation</option>
+                      <option value="Civil">Civil</option>
+                    </select>
+                  </div>
+                )}
+                <Button text={loading ? 'Creating...' : 'Create User'} type="submit" variant="primary" className="w-full py-3 bg-gray-900 text-white rounded-lg" />
+              </form>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );

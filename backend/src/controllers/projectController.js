@@ -1,24 +1,27 @@
 const ProjectModel = require('../models/projectModel');
 
-// 1. Create Project
+// Inside src/controllers/projectController.js
+
 exports.createProject = async (req, res) => {
   try {
-    // A. Role Check
     if (req.userRole !== 'Project Manager') {
       return res.status(403).json({ message: 'Only Project Managers can create projects.' });
     }
 
-    const { project_name, budget } = req.body;
+    // 1. Destructure new fields
+    const { project_name, budget, location, project_type, start_date, end_date } = req.body;
 
-    // B. Get Company ID (Project must belong to the PM's company)
     const companyId = await ProjectModel.getCompanyIdByUser(req.userId);
-    
     if (!companyId) return res.status(404).json({ message: 'Company association not found.' });
 
-    // C. Create Project
+    // 2. Pass new fields to Model
     const projectId = await ProjectModel.create({
       project_name,
-      budget, // [cite: 53]
+      budget,
+      location,       // New
+      project_type,   // New
+      start_date,     // New
+      end_date,       // New
       created_by_pm_id: req.userId,
       company_id: companyId
     });
@@ -42,7 +45,7 @@ exports.getAvailableContractors = async (req, res) => {
   }
 };
 
-// 3. Assign Contractor to Project (UPDATED)
+// 3. Assign Contractor to Project (REVERTED)
 exports.assignContractor = async (req, res) => {
   try {
     // A. Role Check
@@ -52,22 +55,18 @@ exports.assignContractor = async (req, res) => {
 
     const { project_id, contractor_id } = req.body;
 
-    // B. Attempt Assignment
-    // The Database UNIQUE constraint will block this if project is already assigned
+    // B. Check if THIS specific contractor is already assigned to THIS project
+    // (Optional but good practice to prevent assigning the SAME contractor twice)
+    // You would need a new method in ProjectModel like 'checkAssignment(projectId, contractorId)'
+    // For now, we will rely on the database allowing multiple rows.
+
     await ProjectModel.assignContractor(project_id, contractor_id);
 
     res.status(200).json({ message: 'Contractor assigned successfully.' });
 
   } catch (error) {
     console.error(error);
-    
-    // C. Handle Duplicate Entry Error (ER_DUP_ENTRY)
-    if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ 
-        message: 'This project already has a contractor assigned. You cannot assign another one.' 
-      });
-    }
-
+    // We removed the specific check for ER_DUP_ENTRY regarding the project_id
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
@@ -80,4 +79,41 @@ exports.getMyProjects = async (req, res) => {
     } catch (error) {
         res.status(500).json({ message: 'Server Error' });
     }
+};
+
+// Add this new function
+exports.getOwnerProjects = async (req, res) => {
+  try {
+    // 1. Verify Role
+    if (req.userRole !== 'Owner') {
+      return res.status(403).json({ message: 'Access Denied' });
+    }
+
+    // 2. Get Owner's Company ID
+    const companyId = await ProjectModel.getCompanyIdByUser(req.userId);
+    if (!companyId) return res.status(404).json({ message: 'Company not found' });
+
+    // 3. Fetch All Projects for this Company
+    const projects = await ProjectModel.getProjectsByCompany(companyId);
+    
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
+// Add this new function
+exports.getProjectTeam = async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    
+    // Optional: Add check to ensure this PM owns this project
+    
+    const team = await ProjectModel.getAssignedContractorsByProject(projectId);
+    res.status(200).json(team);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Server Error' });
+  }
 };

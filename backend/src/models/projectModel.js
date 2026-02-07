@@ -1,14 +1,18 @@
 const db = require('../config/db');
 
 class ProjectModel {
+  
   // 1. Create a new Project
   static async create(projectData) {
-    const { project_name, budget, created_by_pm_id, company_id } = projectData;
+    const { project_name, budget,location, 
+    project_type, 
+    start_date, 
+    end_date, created_by_pm_id, company_id } = projectData;
     const sql = `
-      INSERT INTO projects (project_name, budget, created_by_pm_id, company_id) 
+      INSERT INTO projects (project_name, budget,location, project_type, start_date, end_date, created_by_pm_id, company_id) 
       VALUES (?, ?, ?, ?)
     `;
-    const [result] = await db.execute(sql, [project_name, budget, created_by_pm_id, company_id]);
+    const [result] = await db.execute(sql, [project_name, budget, location, project_type, start_date, end_date,created_by_pm_id, company_id]);
     return result.insertId;
   }
 
@@ -45,6 +49,24 @@ class ProjectModel {
       const [rows] = await db.execute(sql, [pmId]);
       return rows;
   }
+
+  // Add this method inside the ProjectModel class
+static async getProjectsByCompany(companyId) {
+  const sql = 'SELECT * FROM projects WHERE company_id = ? ORDER BY created_at DESC';
+  const [rows] = await db.execute(sql, [companyId]);
+  return rows;
+}
+// Add inside ProjectModel class
+static async getAssignedContractorsByProject(projectId) {
+  const sql = `
+    SELECT u.user_id, u.email, u.contractor_specialization, pa.assigned_at
+    FROM users u
+    JOIN project_assignments pa ON u.user_id = pa.contractor_id
+    WHERE pa.project_id = ?
+  `;
+  const [rows] = await db.execute(sql, [projectId]);
+  return rows;
+}
 }
 
 module.exports = ProjectModel;
