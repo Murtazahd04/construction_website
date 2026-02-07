@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
-const authRoutes = require('./src/routes/authRoutes');
-const userRoutes = require('./src/routes/userRoutes'); // Import
+const authRoutes = require('./routes/authRoutes');
+const userRoutes = require('./routes/userRoutes'); // Import
+const projectRoutes = require('./routes/projectRoutes')
 const app = express();
 
 app.use(cors());
@@ -10,8 +11,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes); // Register
 app.use('/api/projects', projectRoutes); // Register
-const projectRoutes = require("./routes/projectRoutes");
-app.use("/api/projects", projectRoutes);
+
 const companyRoutes = require('./routes/companyRoutes');
 app.use('/api/companies', companyRoutes);
 module.exports = app;
