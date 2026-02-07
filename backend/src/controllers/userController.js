@@ -1,41 +1,66 @@
 const bcrypt = require('bcryptjs');
 const db = require('../config/db');
 
-// Owner creates Project Manager or Contractor
+// Unified function to create sub-users based on the creator's role
 exports.createSubUser = async (req, res) => {
   try {
-    // 1. Verify if the requester is an Owner
-    if (req.userRole !== 'Owner') {
-      return res.status(403).json({ message: 'Access Denied. Only Owners can create users.' });
+    const { email, role, specialization } = req.body;
+    const creatorRole = req.userRole; // Extracted from the JWT middleware
+
+    // 1. Permission Check Matrix
+    // Defines who is allowed to create whom
+    const allowed = {
+      'Owner': ['Project Manager', 'Contractor'],
+      'Contractor': ['Site Engineer', 'Supplier']
+    };
+
+    // If the creator's role isn't in the list OR they are trying to create a restricted role
+    if (!allowed[creatorRole] || !allowed[creatorRole].includes(role)) {
+      return res.status(403).json({ 
+        message: `Access Denied. ${creatorRole} cannot create ${role}.` 
+      });
     }
 
-    const { email, role, specialization } = req.body; 
-    // Role must be 'Project Manager' or 'Contractor' [cite: 39, 40]
-
-    // 2. Auto-generate password [cite: 41]
+    // 2. Auto-generate temporary password
     const tempPassword = 'User@' + Math.floor(1000 + Math.random() * 9000);
     const hashedPassword = await bcrypt.hash(tempPassword, 10);
 
-    // 3. Get the Company ID of the Owner (to link the new user to the same company)
-    const [ownerRows] = await db.execute('SELECT company_registration_id FROM users WHERE user_id = ?', [req.userId]);
-    const companyId = ownerRows[0].company_registration_id;
+    // 3. Get the Company ID of the Creator 
+    // (The new user must belong to the same company as the person creating them)
+    const [creatorRows] = await db.execute(
+      'SELECT company_registration_id FROM users WHERE user_id = ?', 
+      [req.userId]
+    );
 
-    // 4. Insert the new User
-    // note: created_by_user_id is set to the Owner's ID (req.userId)
+    if (creatorRows.length === 0) {
+      return res.status(404).json({ message: 'Creator user not found.' });
+    }
+
+    const companyId = creatorRows[0].company_registration_id;
+
+    // 4. Insert the new User into the database
     const sql = `
       INSERT INTO users (company_registration_id, email, password_hash, role, contractor_specialization, created_by_user_id) 
       VALUES (?, ?, ?, ?, ?, ?)
     `;
     
+    // Note: 'specialization' is optional (mostly for Contractors), so we pass 'specialization || null'
     await db.execute(sql, [companyId, email, hashedPassword, role, specialization || null, req.userId]);
 
+    // 5. Success Response
     res.status(201).json({ 
       message: `${role} created successfully.`,
       credentials: { email, password: tempPassword } // Return credentials to share with the new user
     });
 
   } catch (error) {
-    console.error(error);
+    console.error('Error creating sub-user:', error);
+    
+    // Handle duplicate email error
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ message: 'A user with this email already exists.' });
+    }
+
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };
