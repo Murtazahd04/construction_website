@@ -1,261 +1,369 @@
-import React from 'react';
-import { Link } from 'react-router-dom'; // Assuming you use react-router
-// Update this line at the top of your file
-import { Check, Menu, X, Building2, Users, ClipboardList, Truck, BarChart3, ShieldCheck } from 'lucide-react';// Install lucide-react for icons: npm install lucide-react
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  Check, Menu, X, Building2, Users, ClipboardList, 
+  Truck, BarChart3, ShieldCheck, ArrowRight,
+  MapPin, Phone, Mail, Facebook, Twitter, Linkedin, Instagram 
+} from 'lucide-react';
+
+// --- IMAGE IMPORTS ---
 import bannerImage from '../assets/banner.jpeg';
-// Add this with your other imports
-import footerImage from '../assets/footer.jpeg'; // Or replace with specific footer image
+import footerImage from '../assets/footer.jpeg'; 
+
+// --- Animation Variants ---
+const fadeInUp = {
+  hidden: { opacity: 0, y: 40 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
+};
+
+const staggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2,
+      delayChildren: 0.1
+    }
+  }
+};
+
 const Navbar = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [navStyle, setNavStyle] = useState('transparent'); // 'transparent' or 'glass'
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const footer = document.getElementById('footer-section');
+      
+      let inFooter = false;
+      if (footer) {
+        // Check if the top of the footer is touching the navbar area (approx 100px from top)
+        const rect = footer.getBoundingClientRect();
+        if (rect.top <= 100) {
+          inFooter = true;
+        }
+      }
+
+      // Logic:
+      // 1. If we are in the Footer -> Transparent (Dark Background)
+      // 2. If we are at the Top (Hero) -> Transparent (Dark Background)
+      // 3. Anywhere else (Middle) -> Glassy White (Light Background)
+      
+      if (scrollY < 800) {
+        // Hero Section
+        setNavStyle('transparent');
+      } else if (inFooter) {
+        // Footer Section
+        setNavStyle('transparent');
+      } else {
+        // Middle Sections
+        setNavStyle('glass');
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // --- Dynamic Styles ---
+  const isTransparent = navStyle === 'transparent';
+
+  const navClasses = isTransparent
+    ? "bg-transparent py-5" 
+    : "bg-white/80 backdrop-blur-md shadow-sm py-3";
+  
+  const textClasses = isTransparent ? "text-white" : "text-slate-900";
+  
+  const buttonClasses = isTransparent 
+    ? "bg-orange-600 text-white hover:bg-orange-700" 
+    : "bg-orange-600 text-white hover:bg-orange-500 shadow-lg shadow-orange-900/20";
+    
+  const logoBg = isTransparent 
+    ? "bg-white/20 backdrop-blur-sm border border-white/30" // Glassy box for dark backgrounds
+    : "bg-slate-900"; // Solid dark box for white background
+    
+  const logoIcon = "text-white"; 
 
   return (
-    <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${navClasses}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
+        <div className="flex justify-between items-center">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center gap-2">
-            <div className="w-8 h-8 bg-orange-500 rounded flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
+          <Link to="/" className="flex-shrink-0 flex items-center gap-3 group">
+            <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${logoBg}`}>
+              <Building2 className={`w-6 h-6 ${logoIcon}`} />
             </div>
-            <span className="font-bold text-xl text-gray-900">BuildFlow</span>
-          </div>
+            <span className={`font-bold text-2xl tracking-tight transition-colors ${textClasses}`}>BuildFlow</span>
+          </Link>
 
           {/* Desktop Buttons */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Link to="/login" className="text-gray-600 hover:text-gray-900 font-medium">
+          <div className="hidden md:flex items-center space-x-8">
+            <Link to="/login" className={`font-semibold text-lg transition-colors hover:text-orange-500 ${textClasses}`}>
               Login
             </Link>
-            <Link to="/register" className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-md font-medium transition-colors">
-              Get Started
+            <Link to="/register">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className={`px-6 py-2.5 rounded-lg font-bold transition-all ${buttonClasses}`}
+              >
+                Get Started
+              </motion.button>
             </Link>
           </div>
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
-            <button onClick={() => setIsOpen(!isOpen)} className="text-gray-600 hover:text-gray-900 focus:outline-none">
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
+            <button onClick={() => setIsOpen(!isOpen)} className={`${textClasses} focus:outline-none`}>
+              {isOpen ? <X size={28} /> : <Menu size={28} />}
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      {isOpen && (
-        <div className="md:hidden bg-white border-t">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <Link to="/login" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Login</Link>
-            <Link to="/register" className="block px-3 py-2 rounded-md text-base font-medium text-orange-600 hover:bg-orange-50">Get Started</Link>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 shadow-xl"
+          >
+            <div className="px-4 pt-4 pb-6 space-y-3">
+              <Link to="/login" className="block w-full text-center px-4 py-3 border border-slate-700 rounded-lg text-white font-bold hover:bg-slate-800">Login</Link>
+              <Link to="/register" className="block w-full text-center px-4 py-3 rounded-lg text-white bg-orange-600 font-bold hover:bg-orange-700 shadow-md">Get Started</Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 };
 
 const HeroSection = () => {
   return (
-    <div className="relative bg-gray-900 h-[600px] flex items-center">
-      {/* Background Image with Dark Overlay */}
-      <div className="absolute inset-0 z-0">
+    <div className="relative bg-slate-900 h-[850px] flex items-center overflow-hidden">
+      {/* Background Image */}
+      <motion.div 
+        initial={{ scale: 1.2 }}
+        animate={{ scale: 1 }}
+        transition={{ duration: 1.5, ease: "easeOut" }}
+        className="absolute inset-0 z-0"
+      >
         <img 
           src={bannerImage} 
           alt="Construction Site" 
-          className="w-full h-full object-cover opacity-40"
+          className="w-full h-full object-cover opacity-50" 
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 to-gray-900/40"></div>
-      </div>
+        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/60 to-transparent"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
+      </motion.div>
 
       {/* Content */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-left">
-        <h1 className="text-4xl tracking-tight font-extrabold text-white sm:text-5xl md:text-6xl">
-          <span className="block">Build Smarter,</span>
-          <span className="block text-orange-500">Manage Better</span>
-        </h1>
-        <p className="mt-3 text-base text-gray-300 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-0 md:mt-5 md:text-xl">
-          Streamline your construction projects with our comprehensive management platform. From site engineers to suppliers, everyone stays connected.
-        </p>
-        <div className="mt-8 sm:mt-10 sm:flex sm:justify-center md:justify-start gap-4">
-          <div className="rounded-md shadow">
-            <Link to="/register" className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 md:py-4 md:text-lg md:px-10">
-              Get Started Free
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={staggerContainer}
+          className="max-w-3xl"
+        >
+          <motion.div variants={fadeInUp} className="inline-flex items-center px-3 py-1 rounded border border-orange-500/50 bg-orange-500/20 text-orange-300 text-sm font-bold uppercase tracking-wider mb-6 backdrop-blur-sm">
+            <span className="w-2 h-2 rounded-full bg-orange-500 mr-2 animate-pulse"></span>
+            Seamless Operations
+          </motion.div>
+          
+          <motion.h1 variants={fadeInUp} className="text-5xl tracking-tight font-extrabold text-white sm:text-7xl leading-tight drop-shadow-lg">
+            Build with <span className="text-white">Precision.</span><br />
+            Manage with <span className="text-orange-500">Power.</span>
+          </motion.h1>
+          
+          <motion.p variants={fadeInUp} className="mt-6 text-xl text-gray-200 leading-relaxed max-w-2xl drop-shadow-md">
+            The all-in-one construction management platform engineered for stability. Connect your site engineers, contractors, and suppliers in one secure ecosystem.
+          </motion.p>
+          
+          <motion.div variants={fadeInUp} className="mt-10 flex flex-col sm:flex-row gap-4">
+            <Link to="/register">
+              <motion.button 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="w-full sm:w-auto flex items-center justify-center px-8 py-4 text-lg font-bold rounded-lg text-white bg-orange-600 hover:bg-orange-500 shadow-xl shadow-orange-900/30 transition-all"
+              >
+                Start Free Trial
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </motion.button>
             </Link>
-          </div>
-          <div className="mt-3 sm:mt-0 sm:ml-3">
-            <Link to="/login" className="w-full flex items-center justify-center px-8 py-3 border border-white/30 text-base font-medium rounded-md text-white bg-transparent hover:bg-white/10 md:py-4 md:text-lg md:px-10 backdrop-blur-sm">
-              Login to Dashboard
-            </Link>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );
 };
-
-const FeatureCard = ({ icon: Icon, title, description }) => (
-  <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-    <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
-      <Icon className="text-orange-600 w-6 h-6" />
-    </div>
-    <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
-    <p className="text-gray-500 text-sm leading-relaxed">{description}</p>
-  </div>
-);
 
 const FeaturesSection = () => {
   const features = [
-    {
-      icon: Building2,
-      title: "Project Management",
-      description: "Oversee all construction projects from a single dashboard with real-time updates."
-    },
-    {
-      icon: Users,
-      title: "Team Coordination",
-      description: "Manage contractors, site engineers, and suppliers with role-based access."
-    },
-    {
-      icon: ClipboardList,
-      title: "Progress Tracking",
-      description: "Daily progress reports with visual charts for day, month, and yearly insights."
-    },
-    {
-      icon: Truck,
-      title: "Material Management",
-      description: "Handle material requests, purchase orders, and supplier invoices seamlessly."
-    },
-    {
-      icon: BarChart3,
-      title: "Budget Control",
-      description: "Set and monitor project budgets with comprehensive financial tracking."
-    },
-    {
-      icon: ShieldCheck,
-      title: "Secure Access",
-      description: "Role-based authentication ensures data security across all levels."
-    }
+    { icon: Building2, title: "Project Management", description: "Centralized command center for all your construction sites with real-time analytics." },
+    { icon: Users, title: "Team Coordination", description: "Granular role-based access for contractors, engineers, and stakeholders." },
+    { icon: ClipboardList, title: "Daily Reporting", description: "Standardized digital logs for site progress, weather conditions, and incidents." },
+    { icon: Truck, title: "Supply Chain", description: "End-to-end material tracking from purchase request to site delivery." },
+    { icon: BarChart3, title: "Financial Control", description: "Strict budget monitoring with automated alerts for cost overruns." },
+    { icon: ShieldCheck, title: "Enterprise Security", description: "Bank-grade data encryption ensuring your proprietary data remains safe." }
   ];
 
   return (
-    <div className="bg-white py-24 border-b border-gray-100">
+    <div className="bg-slate-50 py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-base font-semibold text-orange-600 tracking-wide uppercase">Core Capabilities</h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            Everything You Need to Build Better
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center max-w-3xl mx-auto mb-16"
+        >
+          <h2 className="text-sm font-bold text-orange-600 tracking-widest uppercase">Operational Excellence</h2>
+          <p className="mt-3 text-3xl font-extrabold text-slate-900 sm:text-4xl">
+            Engineered for Efficiency
           </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-            A complete construction management ecosystem designed for modern builders.
+          <p className="mt-4 text-xl text-slate-500">
+            Tools designed to reduce friction and increase visibility across your entire operation.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {features.map((feature, index) => (
-            <FeatureCard key={index} {...feature} />
+            <motion.div 
+              key={index}
+              variants={fadeInUp}
+              whileHover={{ y: -8, transition: { duration: 0.2 } }}
+              className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-300 group"
+            >
+              <div className="w-14 h-14 bg-slate-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-slate-900 transition-colors duration-300">
+                <feature.icon className="text-slate-700 w-7 h-7 group-hover:text-white transition-colors duration-300" />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-orange-600 transition-colors">{feature.title}</h3>
+              <p className="text-slate-500 text-base leading-relaxed">{feature.description}</p>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
 };
+
 const RoleCard = ({ letter, title, description }) => (
-  <div className="bg-white p-6 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
-    <div className="w-12 h-12 bg-gray-900 rounded-full flex items-center justify-center mb-4">
-      <span className="text-white text-xl font-bold">{letter}</span>
+  <motion.div 
+    variants={fadeInUp}
+    whileHover={{ scale: 1.03, y: -5 }}
+    className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all flex flex-col items-center text-center cursor-default"
+  >
+    <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4 ring-4 ring-slate-100 group-hover:ring-orange-100 transition-all">
+      <span className="text-white text-2xl font-bold">{letter}</span>
     </div>
-    <h3 className="text-lg font-bold text-gray-900 mb-2">{title}</h3>
-    <p className="text-gray-500 text-sm leading-relaxed">{description}</p>
-  </div>
+    <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
+    <p className="text-slate-500 text-sm leading-relaxed">{description}</p>
+  </motion.div>
 );
 
 const RolesSection = () => {
   const roles = [
-    {
-      letter: "O",
-      title: "Owner",
-      description: "Full control over company, create managers and contractors."
-    },
-    {
-      letter: "P",
-      title: "Project Manager",
-      description: "Monitor overall progress and manage project budgets."
-    },
-    {
-      letter: "C",
-      title: "Contractor",
-      description: "Manage site engineers, suppliers, and purchase orders."
-    },
-    {
-      letter: "S",
-      title: "Site Engineer",
-      description: "Submit daily reports and material requests."
-    },
-    {
-      letter: "S",
-      title: "Supplier",
-      description: "View purchase orders and submit invoices."
-    },
-    {
-      letter: "A",
-      title: "Admin",
-      description: "Approve company registrations and manage the platform."
-    }
+    { letter: "O", title: "Owner", description: "Strategic oversight and high-level company management." },
+    { letter: "P", title: "Project Manager", description: "Budget authority and timeline enforcement." },
+    { letter: "C", title: "Contractor", description: "Workforce management and task execution." },
+    { letter: "S", title: "Site Engineer", description: "On-ground technical supervision and reporting." },
+    { letter: "V", title: "Vendor", description: "Supply fulfillment and invoice submission." },
+    { letter: "A", title: "Admin", description: "System configuration and user provisioning." }
   ];
 
   return (
-    <div className="bg-gray-50 py-24 border-b border-gray-200">
+    <div className="bg-white py-24 border-y border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-            Built for Every Role
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center max-w-3xl mx-auto mb-16"
+        >
+          <h2 className="text-3xl font-extrabold text-slate-900">
+            Unified Workflow
           </h2>
-          <p className="mt-4 text-lg text-gray-500">
-            Dedicated dashboards and tools for every team member in your construction workflow.
+          <p className="mt-4 text-lg text-slate-500">
+            A single source of truth for every stakeholder.
           </p>
-        </div>
+        </motion.div>
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {roles.map((role, index) => (
             <RoleCard key={index} {...role} />
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
 };
+
 const PricingCard = ({ title, price, frequency, features, isPopular, saveText }) => (
-  <div className={`relative p-8 bg-white border rounded-2xl shadow-sm flex flex-col ${isPopular ? 'border-orange-500 ring-1 ring-orange-500 shadow-xl scale-105 z-10' : 'border-gray-200'}`}>
+  <motion.div 
+    variants={fadeInUp}
+    whileHover={{ scale: 1.05 }}
+    className={`relative p-8 bg-white rounded-xl flex flex-col transition-all duration-300 ${
+      isPopular 
+        ? 'border-2 border-slate-900 shadow-2xl z-10' 
+        : 'border border-slate-200 shadow-sm hover:shadow-xl'
+    }`}
+  >
     {isPopular && (
-      <div className="absolute top-0 right-0 -mt-3 -mr-3 px-3 py-1 bg-orange-500 text-white text-xs font-bold uppercase rounded-full shadow-md">
-        Most Popular
+      <div className="absolute top-0 right-0 -mt-4 px-4 py-1 bg-orange-600 text-white text-xs font-bold uppercase tracking-wider rounded shadow-md">
+        Best Value
       </div>
     )}
     <div className="mb-5">
-      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-      {/* Show savings text if it exists (for yearly plan) */}
+      <h3 className="text-lg font-bold text-slate-900">{title}</h3>
       {saveText ? (
-        <p className="mt-2 text-green-600 text-sm font-semibold">{saveText}</p>
+        <p className="mt-2 inline-block text-green-700 text-xs font-bold bg-green-100 px-2 py-1 rounded">{saveText}</p>
       ) : (
-        <p className="mt-2 text-gray-500 text-sm">Flexible access for your needs.</p>
+        <p className="mt-2 text-transparent text-xs h-6 select-none">.</p>
       )}
     </div>
-    <div className="mb-5">
-      <span className="text-4xl font-bold text-gray-900">₹{price}</span>
-      <span className="text-gray-500">{frequency}</span>
+    <div className="mb-6 pb-6 border-b border-slate-100">
+      <div className="flex items-baseline">
+        <span className="text-4xl font-extrabold text-slate-900">₹{price}</span>
+        <span className="text-slate-500 ml-1 font-medium">{frequency}</span>
+      </div>
     </div>
     <ul className="mb-8 space-y-4 flex-1">
-      {features.map((feature, index) => (
-        <li key={index} className="flex items-start">
-          <Check className="h-5 w-5 text-green-500 mr-2 flex-shrink-0" />
-          <span className="text-gray-600 text-sm">{feature}</span>
+      {features.map((feature, idx) => (
+        <li key={idx} className="flex items-start">
+          <Check className="h-5 w-5 text-slate-900 mr-3 flex-shrink-0" />
+          <span className="text-slate-600 text-sm">{feature}</span>
         </li>
       ))}
     </ul>
-    <button className={`w-full py-2 px-4 rounded-lg font-medium transition-colors ${isPopular ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-gray-100 text-gray-900 hover:bg-gray-200'}`}>
-      Choose Plan
-    </button>
-  </div>
+    <motion.button 
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.98 }}
+      className={`w-full py-3 px-4 rounded-lg font-bold transition-colors ${
+        isPopular 
+          ? 'bg-slate-900 text-white hover:bg-slate-800' 
+          : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
+      }`}
+    >
+      Select Plan
+    </motion.button>
+  </motion.div>
 );
 
 const PricingSection = () => {
@@ -264,116 +372,205 @@ const PricingSection = () => {
       title: "Daily Pass",
       price: "9",
       frequency: "/day",
-      features: ["Full Access for 24 Hours", "Create Limited Projects", "Download Reports", "Standard Support"],
+      features: ["24-Hour Access", "Single Project", "Basic Reports", "Standard Support"],
       isPopular: false
     },
     {
-      title: "Monthly Pro",
+      title: "Professional",
       price: "199",
       frequency: "/month",
-      features: ["Limited Access", "Team Collaboration Tools", "Advanced Analytics", "Inventory Management", "Priority Email Support"],
+      features: ["Full Team Access", "5 Active Projects", "Advanced Analytics", "Inventory Module", "Priority Support"],
       isPopular: true
     },
     {
-      title: "Yearly Elite",
+      title: "Enterprise",
       price: "1599",
       frequency: "/year",
-      features: ["All Monthly Features", "Dedicated Account Manager", "Custom Integrations", "Data Backup & Recovery", "On-site Training Options"],
+      features: ["Unlimited Projects", "Custom API Access", "Dedicated Account Manager", "SLA Guarantee", "On-site Training"],
       isPopular: false,
-      saveText: "Save ~33% vs Monthly" // 199 * 12 = 2388, so 1599 is a big saving
+      saveText: "SAVE 33%"
     }
   ];
 
   return (
-    <div className="bg-gray-50 py-24">
+    <div className="bg-slate-50 py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center">
-          <h2 className="text-base font-semibold text-orange-600 tracking-wide uppercase">Pricing</h2>
-          <p className="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-            Flexible Plans for Every Budget
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-sm font-bold text-orange-600 tracking-widest uppercase">Pricing</h2>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">
+            Transparent Scaling
           </p>
-          <p className="mt-4 max-w-2xl text-xl text-gray-500 mx-auto">
-            Pay as you go daily, or save big with our yearly subscription.
-          </p>
-        </div>
+        </motion.div>
 
-        <div className="mt-16 grid gap-8 lg:grid-cols-3 lg:gap-8 max-w-5xl mx-auto">
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="grid gap-8 lg:grid-cols-3 lg:gap-8 max-w-5xl mx-auto items-center"
+        >
           {plans.map((plan, index) => (
             <PricingCard key={index} {...plan} />
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
 };
 
+// Added id="footer-section" here so Navbar can detect it
 const FooterWithCTA = () => {
   return (
-    <footer>
-      {/* 1. The Call to Action Section with Background Image */}
-      <div className="relative bg-gray-900 py-24 text-center overflow-hidden">
-        
-        {/* Background Image & Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img 
-            src={footerImage} 
-            alt="Footer Background" 
-            className="w-full h-full object-cover opacity-32" 
-          />
-          {/* Gradient Overlay to ensure text readability */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-900/90 via-blue-900/80 to-orange-600/80 mix-blend-multiply"></div>
-        </div>
-
-        {/* Content (z-10 ensures it sits on top of image) */}
-        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            Ready to Transform Your Projects?
-          </h2>
-          <p className="mt-4 text-xl text-blue-100 max-w-2xl mx-auto">
-            Join thousands of construction companies already using BuildFlow to deliver projects on time and within budget.
-          </p>
-          <div className="mt-8">
-            <Link 
-              to="/register" 
-              className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-orange-500 hover:bg-orange-600 md:py-4 md:text-lg md:px-10 shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1"
-            >
-              Start Your Free Trial
-            </Link>
-          </div>
-        </div>
+    <footer id="footer-section" className="relative bg-slate-900 pt-24 pb-12 overflow-hidden text-slate-300">
+      {/* Background Image spanning the WHOLE footer */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src={footerImage} 
+          alt="Footer Background" 
+          className="w-full h-full object-cover opacity-20" 
+        />
+        {/* Dark Blue Overlay */}
+        <div className="absolute inset-0 bg-slate-900/90 mix-blend-multiply"></div>
       </div>
 
-      {/* 2. The Minimal Footer Bar */}
-      <div className="bg-blue-950 py-8 border-t border-blue-900 relative z-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
-          {/* Logo Section */}
-          <div className="flex items-center gap-2 mb-4 md:mb-0">
-            <div className="w-8 h-8 rounded flex items-center justify-center">
-               <Building2 className="text-orange-500 w-8 h-8" />
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* 1. CTA Content */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-20"
+        >
+          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
+            Ready to stabilize your workflow?
+          </h2>
+          <p className="mt-4 text-xl text-slate-400 max-w-2xl mx-auto mb-10">
+            Join the platform built for the demands of modern construction.
+          </p>
+          
+          <Link to="/register">
+            <motion.button 
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-lg text-white bg-orange-600 hover:bg-orange-500 shadow-xl transition-all"
+            >
+              Start Free Trial <ArrowRight className="ml-2 w-5 h-5" />
+            </motion.button>
+          </Link>
+        </motion.div>
+
+        {/* Separator Line */}
+        <div className="border-t border-slate-800 mb-12"></div>
+
+        {/* 2. Expanded Footer Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+          
+          {/* Column 1: Brand Info */}
+          <div>
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-800 border border-slate-700">
+                 <Building2 className="text-white w-6 h-6" />
+              </div>
+              <span className="font-bold text-2xl text-white tracking-tight">BuildFlow</span>
             </div>
-            <span className="font-bold text-xl text-white tracking-tight">BuildFlow</span>
+            <p className="text-slate-400 text-sm leading-relaxed mb-6">
+              Empowering construction teams with seamless management tools for better efficiency, real-time control, and smarter decision making.
+            </p>
+            <div className="flex gap-4">
+              <a href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
+                <Twitter className="w-4 h-4" />
+              </a>
+              <a href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
+                <Linkedin className="w-4 h-4" />
+              </a>
+              <a href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
+                <Facebook className="w-4 h-4" />
+              </a>
+            </div>
           </div>
 
-          {/* Copyright Section */}
-          <p className="text-blue-200 text-sm">
+          {/* Column 2: Solutions / Services */}
+          <div>
+            <h3 className="text-white font-bold text-lg mb-6">Solutions</h3>
+            <ul className="space-y-4 text-sm">
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">Project Management</Link></li>
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">Financial Control</Link></li>
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">Supply Chain Tracking</Link></li>
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">Workforce Coordination</Link></li>
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">Safety Reporting</Link></li>
+            </ul>
+          </div>
+
+          {/* Column 3: Company Links */}
+          <div>
+            <h3 className="text-white font-bold text-lg mb-6">Company</h3>
+            <ul className="space-y-4 text-sm">
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">About Us</Link></li>
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">Careers</Link></li>
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">Blog & News</Link></li>
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">Privacy Policy</Link></li>
+              <li><Link to="#" className="hover:text-orange-500 transition-colors">Terms of Service</Link></li>
+            </ul>
+          </div>
+
+          {/* Column 4: Contact Info */}
+          <div>
+            <h3 className="text-white font-bold text-lg mb-6">Contact Us</h3>
+            <ul className="space-y-4 text-sm">
+              <li className="flex items-start gap-3">
+                <MapPin className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
+                <span>123 Construction Ave,<br/>Mumbai, India 400001</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Phone className="w-5 h-5 text-orange-600 shrink-0" />
+                <span>+91 98765 43210</span>
+              </li>
+              <li className="flex items-center gap-3">
+                <Mail className="w-5 h-5 text-orange-600 shrink-0" />
+                <span>support@buildflow.com</span>
+              </li>
+            </ul>
+          </div>
+
+        </div>
+
+        {/* 3. Bottom Copyright Bar */}
+        <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <p className="text-slate-500 text-sm">
             © 2026 BuildFlow. All rights reserved.
           </p>
+          <div className="flex gap-6 mt-4 md:mt-0">
+             <Link to="#" className="text-slate-500 hover:text-white text-sm">Privacy</Link>
+             <Link to="#" className="text-slate-500 hover:text-white text-sm">Terms</Link>
+             <Link to="#" className="text-slate-500 hover:text-white text-sm">Sitemap</Link>
+          </div>
         </div>
+
       </div>
     </footer>
   );
 };
+
 const LandingPage = () => {
   return (
-    <div className="min-h-screen flex flex-col font-sans">
+    <div className="min-h-screen flex flex-col font-sans bg-white text-slate-900">
       <Navbar />
       <main className="flex-grow">
         <HeroSection />
-        <FeaturesSection /> {/* Added here */}
+        <FeaturesSection />
         <RolesSection />
         <PricingSection />
       </main>
-    <FooterWithCTA />
+      <FooterWithCTA />
     </div>
   );
 };
