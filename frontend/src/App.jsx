@@ -1,53 +1,31 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Import Router components
-import { testBackendConnection } from "./features/projectSlice";
-import LandingPage from "./pages/LandingPage"; // Import your new Landing Page
-// In frontend/src/App.jsx
-import RegisterCompany from "./pages/RegisterCompany";
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import LandingPage from './pages/LandingPage'; // Your provided Landing Page
+import RegisterCompany from './pages/RegisterCompany';
+import Login from './pages/Login';
+import OwnerDashboard from './pages/dashboards/OwnerDashboard';
+
+// Placeholder Components for future flows
+const PMDashboard = () => <div>Project Manager Dashboard (Coming Soon)</div>;
+const ContractorDashboard = () => <div>Contractor Dashboard (Coming Soon)</div>;
+const SiteEngineerDashboard = () => <div>Site Engineer Dashboard (Coming Soon)</div>;
+const SupplierDashboard = () => <div>Supplier Dashboard (Coming Soon)</div>;
+
 function App() {
-  const dispatch = useDispatch();
-
-  // Keep your existing state logic to monitor connection
-  const { message, loading, error } = useSelector(
-    (state) => state.project
-  );
-
-  // Keep your existing effect to test connection on app load
-  useEffect(() => {
-    dispatch(testBackendConnection());
-  }, [dispatch]);
-
-  // Optional: Log connection status to console instead of showing on UI
-  useEffect(() => {
-    if (message) console.log("Backend Status:", message);
-    if (error) console.error("Backend Error:", error);
-  }, [message, error]);
-
   return (
     <Router>
-      {/* Optional: You can keep a small indicator for development 
-        remove this div later when you are done testing 
-      */}
-      {error && (
-        <div className="fixed bottom-4 right-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded z-50">
-          <p className="font-bold">Connection Error</p>
-          <p className="text-sm">{error}</p>
-        </div>
-      )}
-
       <Routes>
-        {/* The Landing Page will now be the default home page */}
         <Route path="/" element={<LandingPage />} />
-
-
         <Route path="/register" element={<RegisterCompany />} />
-        {/* You can add more routes here later, e.g.:
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/dashboard" element={<Dashboard />} /> 
-        */}
+        <Route path="/login" element={<Login />} />
+        
+        {/* Protected Dashboard Routes */}
+        <Route path="/owner-dashboard" element={<OwnerDashboard />} />
+        <Route path="/pm-dashboard" element={<PMDashboard />} />
+        <Route path="/contractor-dashboard" element={<ContractorDashboard />} />
+        <Route path="/site-engineer-dashboard" element={<SiteEngineerDashboard />} />
+        <Route path="/supplier-dashboard" element={<SupplierDashboard />} />
       </Routes>
-
     </Router>
   );
 }

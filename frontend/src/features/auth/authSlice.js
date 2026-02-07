@@ -39,6 +39,7 @@ const authSlice = createSlice({
     role: null,
     loading: false,
     error: null,
+    successMessage: null, // To show "Pending Approval"
   },
   reducers: {
     logout: (state) => {
@@ -46,6 +47,12 @@ const authSlice = createSlice({
       state.token = null;
       state.role = null;
       localStorage.removeItem('token');
+    },
+    
+    resetAuth: (state) => {
+      state.loading = false;
+      state.successMessage = null;
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -60,6 +67,14 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.user = action.payload.user;
         state.role = action.payload.user.role;
+      })
+      .addCase(registerCompany.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerCompany.fulfilled, (state, action) => {
+        state.loading = false;
+        state.successMessage = action.payload.message;
       })
      .addCase(registerCompany.rejected, (state, action) => {
         state.loading = false;
