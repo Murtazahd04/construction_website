@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 
 // --- IMAGE IMPORTS ---
+// Make sure these images exist in your assets folder, or replace with URLs
 import bannerImage from '../assets/banner.jpeg';
 import footerImage from '../assets/footer.jpeg'; 
 
@@ -28,9 +29,12 @@ const staggerContainer = {
   }
 };
 
+// ==============================
+// 1. NAVBAR COMPONENT
+// ==============================
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [navStyle, setNavStyle] = useState('transparent'); // 'transparent' or 'glass'
+  const [navStyle, setNavStyle] = useState('transparent');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -39,27 +43,16 @@ const Navbar = () => {
       
       let inFooter = false;
       if (footer) {
-        // Check if the top of the footer is touching the navbar area (approx 100px from top)
         const rect = footer.getBoundingClientRect();
-        if (rect.top <= 100) {
-          inFooter = true;
-        }
+        if (rect.top <= 100) inFooter = true;
       }
 
-      // Logic:
-      // 1. If we are in the Footer -> Transparent (Dark Background)
-      // 2. If we are at the Top (Hero) -> Transparent (Dark Background)
-      // 3. Anywhere else (Middle) -> Glassy White (Light Background)
-      
       if (scrollY < 800) {
-        // Hero Section
-        setNavStyle('transparent');
+        setNavStyle('transparent'); // Hero Section
       } else if (inFooter) {
-        // Footer Section
-        setNavStyle('transparent');
+        setNavStyle('transparent'); // Footer Section
       } else {
-        // Middle Sections
-        setNavStyle('glass');
+        setNavStyle('glass'); // Middle Sections
       }
     };
 
@@ -67,23 +60,13 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // --- Dynamic Styles ---
   const isTransparent = navStyle === 'transparent';
-
-  const navClasses = isTransparent
-    ? "bg-transparent py-5" 
-    : "bg-white/80 backdrop-blur-md shadow-sm py-3";
-  
+  const navClasses = isTransparent ? "bg-transparent py-5" : "bg-white/80 backdrop-blur-md shadow-sm py-3";
   const textClasses = isTransparent ? "text-white" : "text-slate-900";
-  
   const buttonClasses = isTransparent 
     ? "bg-orange-600 text-white hover:bg-orange-700" 
     : "bg-orange-600 text-white hover:bg-orange-500 shadow-lg shadow-orange-900/20";
-    
-  const logoBg = isTransparent 
-    ? "bg-white/20 backdrop-blur-sm border border-white/30" // Glassy box for dark backgrounds
-    : "bg-slate-900"; // Solid dark box for white background
-    
+  const logoBg = isTransparent ? "bg-white/20 backdrop-blur-sm border border-white/30" : "bg-slate-900";
   const logoIcon = "text-white"; 
 
   return (
@@ -91,19 +74,19 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <Link to="/" className="flex-shrink-0 flex items-center gap-3 group">
+          <div className="flex-shrink-0 flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo(0,0)}>
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${logoBg}`}>
               <Building2 className={`w-6 h-6 ${logoIcon}`} />
             </div>
             <span className={`font-bold text-2xl tracking-tight transition-colors ${textClasses}`}>BuildFlow</span>
-          </Link>
+          </div>
 
           {/* Desktop Buttons */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/login" className={`font-semibold text-lg transition-colors hover:text-orange-500 ${textClasses}`}>
               Login
             </Link>
-            <Link to="/register">
+            <Link to="/get-started">
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -133,8 +116,12 @@ const Navbar = () => {
             className="md:hidden bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 shadow-xl"
           >
             <div className="px-4 pt-4 pb-6 space-y-3">
-              <Link to="/login" className="block w-full text-center px-4 py-3 border border-slate-700 rounded-lg text-white font-bold hover:bg-slate-800">Login</Link>
-              <Link to="/register" className="block w-full text-center px-4 py-3 rounded-lg text-white bg-orange-600 font-bold hover:bg-orange-700 shadow-md">Get Started</Link>
+              <Link to="/login" className="block w-full text-center px-4 py-3 border border-slate-700 rounded-lg text-white font-bold hover:bg-slate-800">
+                Login
+              </Link>
+              <Link to="/get-started" className="block w-full text-center px-4 py-3 rounded-lg text-white bg-orange-600 font-bold hover:bg-orange-700 shadow-md">
+                Get Started
+              </Link>
             </div>
           </motion.div>
         )}
@@ -143,6 +130,9 @@ const Navbar = () => {
   );
 };
 
+// ==============================
+// 2. HERO SECTION
+// ==============================
 const HeroSection = () => {
   return (
     <div className="relative bg-slate-900 h-[850px] flex items-center overflow-hidden">
@@ -185,7 +175,7 @@ const HeroSection = () => {
           </motion.p>
           
           <motion.div variants={fadeInUp} className="mt-10 flex flex-col sm:flex-row gap-4">
-            <Link to="/register">
+            <Link to="/get-started">
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -202,6 +192,9 @@ const HeroSection = () => {
   );
 };
 
+// ==============================
+// 3. FEATURES SECTION
+// ==============================
 const FeaturesSection = () => {
   const features = [
     { icon: Building2, title: "Project Management", description: "Centralized command center for all your construction sites with real-time analytics." },
@@ -258,6 +251,9 @@ const FeaturesSection = () => {
   );
 };
 
+// ==============================
+// 4. ROLES SECTION
+// ==============================
 const RoleCard = ({ letter, title, description }) => (
   <motion.div 
     variants={fadeInUp}
@@ -315,6 +311,9 @@ const RolesSection = () => {
   );
 };
 
+// ==============================
+// 5. PRICING SECTION
+// ==============================
 const PricingCard = ({ title, price, frequency, features, isPopular, saveText }) => (
   <motion.div 
     variants={fadeInUp}
@@ -423,24 +422,25 @@ const PricingSection = () => {
   );
 };
 
-// Added id="footer-section" here so Navbar can detect it
+// ==============================
+// 6. FOOTER COMPONENT
+// ==============================
 const FooterWithCTA = () => {
   return (
     <footer id="footer-section" className="relative bg-slate-900 pt-24 pb-12 overflow-hidden text-slate-300">
-      {/* Background Image spanning the WHOLE footer */}
+      {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <img 
           src={footerImage} 
           alt="Footer Background" 
           className="w-full h-full object-cover opacity-20" 
         />
-        {/* Dark Blue Overlay */}
         <div className="absolute inset-0 bg-slate-900/90 mix-blend-multiply"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* 1. CTA Content */}
+        {/* CTA Content */}
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -454,7 +454,7 @@ const FooterWithCTA = () => {
             Join the platform built for the demands of modern construction.
           </p>
           
-          <Link to="/register">
+          <Link to="/get-started">
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -468,7 +468,7 @@ const FooterWithCTA = () => {
         {/* Separator Line */}
         <div className="border-t border-slate-800 mb-12"></div>
 
-        {/* 2. Expanded Footer Content Grid */}
+        {/* Expanded Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
           
           {/* Column 1: Brand Info */}
@@ -483,42 +483,31 @@ const FooterWithCTA = () => {
               Empowering construction teams with seamless management tools for better efficiency, real-time control, and smarter decision making.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
-                <Twitter className="w-4 h-4" />
-              </a>
-              <a href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
-                <Linkedin className="w-4 h-4" />
-              </a>
-              <a href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
-                <Instagram className="w-4 h-4" />
-              </a>
-              <a href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
-                <Facebook className="w-4 h-4" />
-              </a>
+              {[Twitter, Linkedin, Instagram, Facebook].map((Icon, i) => (
+                <a key={i} href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
+                  <Icon className="w-4 h-4" />
+                </a>
+              ))}
             </div>
           </div>
 
-          {/* Column 2: Solutions / Services */}
+          {/* Column 2: Solutions */}
           <div>
             <h3 className="text-white font-bold text-lg mb-6">Solutions</h3>
             <ul className="space-y-4 text-sm">
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">Project Management</Link></li>
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">Financial Control</Link></li>
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">Supply Chain Tracking</Link></li>
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">Workforce Coordination</Link></li>
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">Safety Reporting</Link></li>
+              {['Project Management', 'Financial Control', 'Supply Chain Tracking', 'Workforce Coordination', 'Safety Reporting'].map(item => (
+                <li key={item}><Link to="#" className="hover:text-orange-500 transition-colors">{item}</Link></li>
+              ))}
             </ul>
           </div>
 
-          {/* Column 3: Company Links */}
+          {/* Column 3: Company */}
           <div>
             <h3 className="text-white font-bold text-lg mb-6">Company</h3>
             <ul className="space-y-4 text-sm">
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">About Us</Link></li>
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">Careers</Link></li>
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">Blog & News</Link></li>
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">Privacy Policy</Link></li>
-              <li><Link to="#" className="hover:text-orange-500 transition-colors">Terms of Service</Link></li>
+              {['About Us', 'Careers', 'Blog & News', 'Privacy Policy', 'Terms of Service'].map(item => (
+                <li key={item}><Link to="#" className="hover:text-orange-500 transition-colors">{item}</Link></li>
+              ))}
             </ul>
           </div>
 
@@ -543,7 +532,7 @@ const FooterWithCTA = () => {
 
         </div>
 
-        {/* 3. Bottom Copyright Bar */}
+        {/* Bottom Copyright Bar */}
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
           <p className="text-slate-500 text-sm">
             © 2026 BuildFlow. All rights reserved.
@@ -560,6 +549,9 @@ const FooterWithCTA = () => {
   );
 };
 
+// ==============================
+// 7. MAIN PAGE EXPORT
+// ==============================
 const LandingPage = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white text-slate-900">

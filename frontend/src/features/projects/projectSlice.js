@@ -1,44 +1,55 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../../api/axios';
+import axios from 'axios';
 
-// 1. Create Project
+const API_URL = 'http://localhost:5000/api/projects';
+
+// ==========================================
+// 1. ASYNC THUNKS (API CALLS)
+// ==========================================
+
+// Create Project (Flow 3 - PM/Owner)
 export const createProject = createAsyncThunk(
     'projects/create',
-    async (projectData, { getState, rejectWithValue }) => {
+    async ({ data, token }, { rejectWithValue }) => {
         try {
-            const { token } = getState().auth;
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const response = await api.post('/projects/create', projectData, config);
+            const response = await axios.post(`${API_URL}/create`, data, config);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data);
+            return rejectWithValue(error.response?.data || { message: 'Failed to create project' });
         }
     }
 );
 
-// 2. Fetch My Projects
+// ✅ PRIMARY ACTION: Fetch Projects (Used by PM Dashboard)
 export const fetchProjects = createAsyncThunk(
-    'projects/fetch',
-    async (_, { getState, rejectWithValue }) => {
+    'projects/fetchProjects',
+    async (token, { rejectWithValue }) => {
         try {
-            const { token } = getState().auth;
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const response = await api.get('/projects/list', config);
+            const response = await axios.get(`${API_URL}/list`, config);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data);
+            return rejectWithValue(error.response?.data || { message: 'Failed to fetch projects' });
         }
     }
 );
 
-// 3. Fetch Available Contractors
+// ✅ ALIAS: Fetch My Projects (Used by Contractor Dashboard)
+// This just points to the same logic as fetchProjects
+export const fetchMyProjects = fetchProjects;
+
+// ✅ ALIAS: Fetch Owner Projects (Used by Owner Dashboard)
+export const fetchOwnerProjects = fetchProjects;
+
+
+// Fetch Available Contractors
 export const fetchContractors = createAsyncThunk(
     'projects/fetchContractors',
-    async (_, { getState, rejectWithValue }) => {
+    async (token, { rejectWithValue }) => {
         try {
-            const { token } = getState().auth;
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const response = await api.get('/projects/contractors', config);
+            const response = await axios.get(`${API_URL}/contractors`, config);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data);
@@ -46,66 +57,45 @@ export const fetchContractors = createAsyncThunk(
     }
 );
 
-// Add this Thunk
-export const fetchOwnerProjects = createAsyncThunk(
-    'projects/fetchOwnerProjects',
-    async (_, { getState, rejectWithValue }) => {
-        try {
-            const { token } = getState().auth;
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            const response = await api.get('/projects/owner/list', config);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data);
-        }
-    }
-);
-
-// 1. Add this Thunk
-export const fetchProjectTeam = createAsyncThunk(
-    'projects/fetchTeam',
-    async (projectId, { getState, rejectWithValue }) => {
-        try {
-            const { token } = getState().auth;
-            const config = { headers: { Authorization: `Bearer ${token}` } };
-            const response = await api.get(`/projects/${projectId}/team`, config);
-            return response.data;
-        } catch (error) {
-            return rejectWithValue(error.response?.data);
-        }
-    }
-);
-
-// 2. Update Initial State
-const initialState = {
-    projects: [],
-    contractors: [],
-    currentProjectTeam: [], // Store the team for the selected project
-    loading: false,
-    error: null,
-    successMessage: null,
-};
-
-// 4. Assign Contractor
+// Assign Contractor
 export const assignContractor = createAsyncThunk(
     'projects/assign',
-    async (assignmentData, { getState, rejectWithValue }) => {
+    async ({ data, token }, { rejectWithValue }) => {
         try {
-            const { token } = getState().auth;
             const config = { headers: { Authorization: `Bearer ${token}` } };
-            const response = await api.post('/projects/assign', assignmentData, config);
+            const response = await axios.post(`${API_URL}/assign`, data, config);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data);
         }
     }
 );
+
+// Fetch Project Team
+export const fetchProjectTeam = createAsyncThunk(
+    'projects/fetchTeam',
+    async ({ projectId, token }, { rejectWithValue }) => {
+        try {
+            const config = { headers: { Authorization: `Bearer ${token}` } };
+            const response = await axios.get(`${API_URL}/${projectId}/team`, config);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data);
+        }
+    }
+);
+
+// ==========================================
+// 2. SLICE DEFINITION
+// ==========================================
 
 const projectSlice = createSlice({
     name: 'projects',
     initialState: {
-        projects: [],
+        list: [],
+        projects: [], // Added for compatibility if PM dashboard uses state.projects.projects
         contractors: [],
+        currentProjectTeam: [],
         loading: false,
         error: null,
         successMessage: null,
@@ -114,11 +104,12 @@ const projectSlice = createSlice({
         clearProjectState: (state) => {
             state.successMessage = null;
             state.error = null;
+            state.loading = false;
         }
     },
     extraReducers: (builder) => {
         builder
-            // Create Project
+            // --- Create Project ---
             .addCase(createProject.pending, (state) => { state.loading = true; })
             .addCase(createProject.fulfilled, (state, action) => {
                 state.loading = false;
@@ -129,27 +120,35 @@ const projectSlice = createSlice({
                 state.error = action.payload?.message;
             })
 
-            // Fetch Projects
+            // --- Fetch Projects (Handles fetchProjects, fetchMyProjects, fetchOwnerProjects) ---
+            .addCase(fetchProjects.pending, (state) => { state.loading = true; })
             .addCase(fetchProjects.fulfilled, (state, action) => {
-                state.projects = action.payload;
+                state.loading = false;
+                state.list = action.payload; 
+                state.projects = action.payload; // Sync both for compatibility
+            })
+            .addCase(fetchProjects.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload?.message;
             })
 
-            // Fetch Contractors
+            // --- Fetch Contractors ---
             .addCase(fetchContractors.fulfilled, (state, action) => {
                 state.contractors = action.payload;
             })
 
-            // Assign Contractor
+            // --- Assign Contractor ---
             .addCase(assignContractor.fulfilled, (state, action) => {
                 state.successMessage = 'Contractor Assigned Successfully';
             })
             .addCase(assignContractor.rejected, (state, action) => {
                 state.error = action.payload?.message;
+            })
+
+            // --- Fetch Team ---
+            .addCase(fetchProjectTeam.fulfilled, (state, action) => {
+                state.currentProjectTeam = action.payload;
             });
-        // 3. Update extraReducers
-        builder.addCase(fetchProjectTeam.fulfilled, (state, action) => {
-            state.currentProjectTeam = action.payload;
-        });
     },
 });
 
