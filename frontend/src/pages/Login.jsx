@@ -4,6 +4,7 @@ import { loginUser } from '../features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -46,13 +47,18 @@ const Login = () => {
       }
     }
   }, [role, navigate]);
+useEffect(() => {
+  if (error) {
+    toast.error(error);
+  }
+}, [error]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full max-w-md bg-white p-8 rounded shadow-md">
         <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Login</h2>
         
-        {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
+        
 
         <form onSubmit={handleSubmit}>
           <Input 

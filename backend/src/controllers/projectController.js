@@ -42,27 +42,32 @@ exports.getAvailableContractors = async (req, res) => {
   }
 };
 
-// 3. Assign Contractor to Project
+// 3. Assign Contractor to Project (UPDATED)
 exports.assignContractor = async (req, res) => {
   try {
+    // A. Role Check
     if (req.userRole !== 'Project Manager') {
       return res.status(403).json({ message: 'Unauthorized.' });
     }
 
-    const { project_id, contractor_id } = req.body; // [cite: 46]
+    const { project_id, contractor_id } = req.body;
 
-    // (Optional: Verify here that project_id actually belongs to this PM 
-    // and contractor_id belongs to the same company to prevent cross-company data leaks)
-
+    // B. Attempt Assignment
+    // The Database UNIQUE constraint will block this if project is already assigned
     await ProjectModel.assignContractor(project_id, contractor_id);
 
     res.status(200).json({ message: 'Contractor assigned successfully.' });
 
   } catch (error) {
     console.error(error);
+    
+    // C. Handle Duplicate Entry Error (ER_DUP_ENTRY)
     if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ message: 'Contractor is already assigned to this project.' });
+      return res.status(400).json({ 
+        message: 'This project already has a contractor assigned. You cannot assign another one.' 
+      });
     }
+
     res.status(500).json({ message: 'Server Error', error: error.message });
   }
 };

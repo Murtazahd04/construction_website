@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs'); // You will need: npm install bcryptjs
 const CompanyModel = require('../models/companyModel');
 const UserModel = require('../models/userModel');
 const db = require('../config/db'); // Access direct DB for login query
+const jwt = require('jsonwebtoken');
 // 1. Handle "Get Started" - Company Registration
 exports.registerCompany = async (req, res) => {
   try {

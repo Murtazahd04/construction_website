@@ -1,5 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
-import projectReducer from "../features/projectSlice";
+import projectReducer from '../features/projects/projectSlice'; // Import
 import companyReducer from '../features/company/companySlice';
 import authReducer from '../features/auth/authSlice';
 import userReducer from '../features/users/userSlice'; // Import
@@ -9,5 +9,6 @@ export const store = configureStore({
     company: companyReducer,
     auth: authReducer,
     users: userReducer, // Add
+    projects: projectReducer, // Register
   },
 });

@@ -48,7 +48,7 @@ const authSlice = createSlice({
       state.role = null;
       localStorage.removeItem('token');
     },
-    
+
     resetAuth: (state) => {
       state.loading = false;
       state.successMessage = null;
@@ -68,19 +68,24 @@ const authSlice = createSlice({
         state.user = action.payload.user;
         state.role = action.payload.user.role;
       })
+      .addCase(loginUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Invalid credentials';
+      })
+
       .addCase(registerCompany.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(registerCompany.fulfilled, (state, action) => {
-        state.loading = false;
-        state.successMessage = action.payload.message;
-      })
-     .addCase(registerCompany.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Registration failed';
-      });
-  },
+    .addCase(registerCompany.fulfilled, (state, action) => {
+      state.loading = false;
+      state.successMessage = action.payload.message;
+    })
+    .addCase(registerCompany.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload?.message || 'Registration failed';
+    })
+},
 });
 export const { logout } = authSlice.actions;
 export const { resetAuth } = authSlice.actions;
