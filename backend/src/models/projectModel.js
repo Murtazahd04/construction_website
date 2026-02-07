@@ -10,7 +10,7 @@ class ProjectModel {
     end_date, created_by_pm_id, company_id } = projectData;
     const sql = `
       INSERT INTO projects (project_name, budget,location, project_type, start_date, end_date, created_by_pm_id, company_id) 
-      VALUES (?, ?, ?, ?)
+      VALUES (?, ?, ?, ?,?,?,?,?)
     `;
     const [result] = await db.execute(sql, [project_name, budget, location, project_type, start_date, end_date,created_by_pm_id, company_id]);
     return result.insertId;
