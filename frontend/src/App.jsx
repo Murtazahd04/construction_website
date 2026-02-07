@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { BrowserRouter, Routes, Route } from "react-router-dom"; // Import Router components
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom"; // Import Router components
 import { testBackendConnection } from "./features/projectSlice";
 import LandingPage from "./pages/LandingPage"; // Import your new Landing Page
 // In frontend/src/App.jsx
@@ -25,7 +25,7 @@ function App() {
   }, [message, error]);
 
   return (
-    <BrowserRouter>
+    <Router>
       {/* Optional: You can keep a small indicator for development 
         remove this div later when you are done testing 
       */}
@@ -48,7 +48,7 @@ function App() {
         */}
       </Routes>
 
-    </BrowserRouter>
+    </Router>
   );
 }
 
