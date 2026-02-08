@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser } from '../features/auth/authSlice';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Building2, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 import { toast } from 'react-toastify';
-
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -27,9 +28,8 @@ const Login = () => {
   // Redirect based on Role
   useEffect(() => {
     if (role) {
-
       switch (role) {
-        case 'Admin': // ✅ Route for System Admin
+        case 'Admin':
           navigate('/admin-dashboard');
           break;
         case 'Owner':
@@ -53,9 +53,6 @@ const Login = () => {
     }
   }, [role, navigate]);
 
-
-
-
   useEffect(() => {
     if (error) {
       toast.error(error);
@@ -63,64 +60,118 @@ const Login = () => {
   }, [error]);
 
   return (
-    <div
-      // Changed background from orange gradient to a clean, professional light gray
-      className="flex items-center justify-center min-h-screen bg-gray-50 p-4"
-    >
-      <div className="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border-t-4 border-orange-600">
+    <div className="relative min-h-screen w-full flex items-center justify-center p-4 overflow-hidden bg-slate-950">
+      {/* Dynamic Background Gradients */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-orange-600/20 blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/10 blur-[120px]" />
+      </div>
 
-        {/* Welcome Header Section */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-orange-100 mb-4 shadow-sm">
-            <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-            </svg>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="relative z-10 w-full max-w-md"
+      >
+        {/* Main Card */}
+        <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl">
+          
+          {/* Header */}
+          <div className="text-center mb-10">
+            <motion.div 
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="inline-flex items-center justify-center w-16 h-16 rounded-xl bg-gradient-to-br from-orange-500 to-orange-700 mb-6 shadow-lg shadow-orange-900/40"
+            >
+              <Building2 className="w-8 h-8 text-white" />
+            </motion.div>
+            
+            <h1 className="text-3xl font-bold text-white tracking-tight">BuildFlow</h1>
+            <p className="text-slate-400 mt-2 text-sm font-medium uppercase tracking-[0.2em]">
+              Construction Management
+            </p>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900">Welcome To</h1>
-          <p className="text-gray-500 mt-2 text-sm uppercase tracking-wide font-semibold">
-            Construction Management System
-          </p>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="relative">
+              <Input
+                label={<span className="text-slate-300 text-sm font-semibold">Email Address</span>}
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                placeholder="name@company.com"
+                className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:ring-orange-500 focus:border-orange-500 transition-all"
+              />
+            </div>
+
+            <div className="relative">
+              <Input
+                label={<span className="text-slate-300 text-sm font-semibold">Password</span>}
+                name="password"
+                type="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                placeholder="••••••••"
+                className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-600 focus:ring-orange-500 focus:border-orange-500 transition-all"
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-xs pt-1">
+              <label className="flex items-center text-slate-400 cursor-pointer">
+                <input type="checkbox" className="mr-2 accent-orange-500 rounded border-slate-700 bg-slate-800" />
+                Remember me
+              </label>
+              <Link to="/forgot-password" size="sm" className="text-orange-500 hover:text-orange-400 font-medium transition-colors">
+                Forgot password?
+              </Link>
+            </div>
+
+            <motion.div
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="pt-4"
+            >
+              <button
+                type="submit"
+                disabled={loading}
+                className={`group relative w-full flex items-center justify-center py-3.5 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-orange-600 hover:bg-orange-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-all duration-200 shadow-lg shadow-orange-900/20 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              >
+                {loading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    Sign In
+                    <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </button>
+            </motion.div>
+          </form>
+
+          {/* Footer Link */}
+          <div className="mt-8 text-center">
+            <p className="text-slate-400 text-sm">
+              Don't have an account?{' '}
+              <Link to="/register" className="text-orange-500 font-bold hover:text-orange-400 transition-colors">
+                Register Company
+              </Link>
+            </p>
+          </div>
         </div>
 
-        <h2 className="text-xl font-semibold mb-6 text-gray-700 text-center">Login to your account</h2>
-
-        <form onSubmit={handleSubmit}>
-          <Input
-            label="Email Address"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-            placeholder="name@company.com"
-          />
-          <Input
-            label="Password"
-            name="password"
-            type="password"
-            value={formData.password}
-            onChange={handleChange}
-            required
-            placeholder="Enter your password"
-          />
-
-          <div className="mt-8">
-            <Button
-              text={loading ? 'Authenticating...' : 'Login'}
-              type="submit"
-              variant="primary"
-              className={`w-full py-3 text-lg font-bold text-white shadow-lg transition-all duration-300 
-              bg-orange-600 
-              hover:bg-orange-700 
-              hover:shadow-xl 
-              hover:-translate-y-1 
-              ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-              disabled={loading}
-            />
-          </div>
-        </form>
-
-      </div>
+        {/* Bottom Decorative Bar */}
+        <div className="mt-8 flex justify-center space-x-6 text-slate-500 text-xs font-medium">
+          <span>Privacy Policy</span>
+          <span>•</span>
+          <span>Terms of Service</span>
+          <span>•</span>
+          <span>Help Center</span>
+        </div>
+      </motion.div>
     </div>
   );
 };

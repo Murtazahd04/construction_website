@@ -1,23 +1,56 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import PrivateRoute from './components/common/PrivateRoute'; // Import the guard
-// --- Import Pages ---
-import LandingPage from './pages/LandingPage'; // ✅ Import Landing Page
+
+// --- Authentication Guard ---
+import PrivateRoute from './components/common/PrivateRoute'; 
+
+// --- Import Public Pages ---
+import LandingPage from './pages/LandingPage'; 
 import Login from './pages/Login';
 import RegisterCompany from './pages/RegisterCompany';
 
-// --- Import Dashboards ---
+// --- Import Role-Based Dashboards ---
 import OwnerDashboard from './pages/dashboards/OwnerDashboard';
 import ProjectManagerDashboard from './pages/dashboards/PMDashboard';
-import ContractorDashboard from './pages/ContractorDashboard';
-import SiteEngineerDashboard from './pages/SiteEngineerDashboard';
-import SupplierDashboard from './pages/SupplierDashboard';
-import AdminDashboard from './pages/AdminDashboard';
+import ContractorDashboard from './pages/dashboards/ContractorDashboard';
+import SiteEngineerDashboard from './pages/dashboards/SiteEngineerDashboard';
+import SupplierDashboard from './pages/dashboards/SupplierDashboard';
+import AdminDashboard from './pages/dashboards/AdminDashboard';
+
+/**
+ * RefreshHandler Component
+ * Detects if the user has performed a browser refresh.
+ * If a refresh is detected, it redirects the user to the landing page.
+ */
+const RefreshHandler = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    // Check performance entries to identify if the navigation type was a 'reload'
+    const [navigation] = performance.getEntriesByType('navigation');
+    
+    if (navigation && navigation.type === 'reload') {
+      // If we are already at the root, no need to navigate
+      if (location.pathname !== '/') {
+        console.log("System Alert: Browser refresh detected. Redirecting to Entry Point.");
+        navigate('/', { replace: true });
+      }
+    }
+  }, [navigate, location.pathname]);
+
+  return null;
+};
+
 function App() {
   return (
     <Router>
+      {/* Listens for browser refresh events to reset the navigation state */}
+      <RefreshHandler />
+
+      {/* Global Notification System */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -28,43 +61,62 @@ function App() {
         pauseOnFocusLoss
         draggable
         pauseOnHover
-        theme="light"
+        theme="dark" 
       />
 
       <Routes>
-       
+        {/* ==============================
+            PUBLIC ROUTES
+            ============================== */}
+        
+        {/* Entry Point: Landing Page */}
+        <Route path="/" element={<LandingPage />} />
+
+        {/* Authentication: User Login */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Onboarding: Company Registration */}
+        <Route path="/get-started" element={<RegisterCompany />} />
+
+        {/* ==============================
+            PROTECTED DASHBOARD ROUTES
+            ============================== */}
+
+        {/* System Administrator Dashboard */}
         <Route element={<PrivateRoute allowedRoles={['Admin']} />}>
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
         </Route>
-        {/* ✅ 1. ROOT: Show Landing Page first */}
-        <Route path="/" element={<LandingPage />} />
 
-        {/* ✅ 2. AUTH: Login & Sign Up Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/get-started" element={<RegisterCompany />} />
-
-        {/* ✅ 3. DASHBOARDS: Protected Routes */}
+        {/* Corporate Owner Dashboard */}
         <Route element={<PrivateRoute allowedRoles={['Owner']} />}>
           <Route path="/owner-dashboard" element={<OwnerDashboard />} />
         </Route>
-        {/* 2. Project Manager Routes */}
+
+        {/* Project Manager Dashboard */}
         <Route element={<PrivateRoute allowedRoles={['Project Manager']} />}>
           <Route path="/project-manager-dashboard" element={<ProjectManagerDashboard />} />
         </Route>
-        {/* 3. Contractor Routes */}
+
+        {/* Contractor Operations Dashboard */}
         <Route element={<PrivateRoute allowedRoles={['Contractor']} />}>
           <Route path="/contractor-dashboard" element={<ContractorDashboard />} />
         </Route>
-        {/* 4. Site Engineer Routes */}
+
+        {/* Field / Site Engineer Dashboard */}
         <Route element={<PrivateRoute allowedRoles={['Site Engineer']} />}>
-          { <Route path="/site-engineer-dashboard" element={<SiteEngineerDashboard />} /> }
-        </Route>
-        {/* 5. Supplier Routes */}
-        <Route element={<PrivateRoute allowedRoles={['Supplier']} />}>
-          {<Route path="/supplier-dashboard" element={<SupplierDashboard />} /> }
+          <Route path="/site-engineer-dashboard" element={<SiteEngineerDashboard />} />
         </Route>
 
-        {/* Catch-all: Redirect to Landing Page */}
+        {/* Supplier / Vendor Dashboard */}
+        <Route element={<PrivateRoute allowedRoles={['Supplier']} />}>
+          <Route path="/supplier-dashboard" element={<SupplierDashboard />} />
+        </Route>
+
+        {/* ==============================
+            FALLBACK ROUTE
+            ============================== */}
+        
+        {/* Wildcard: Any undefined route redirects to Landing Page */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

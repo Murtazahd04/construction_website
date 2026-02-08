@@ -8,7 +8,6 @@ import {
 } from 'lucide-react';
 
 // --- IMAGE IMPORTS ---
-// Make sure these images exist in your assets folder, or replace with URLs
 import bannerImage from '../assets/banner.jpeg';
 import footerImage from '../assets/footer.jpeg'; 
 
@@ -48,11 +47,11 @@ const Navbar = () => {
       }
 
       if (scrollY < 800) {
-        setNavStyle('transparent'); // Hero Section
+        setNavStyle('transparent');
       } else if (inFooter) {
-        setNavStyle('transparent'); // Footer Section
+        setNavStyle('transparent');
       } else {
-        setNavStyle('glass'); // Middle Sections
+        setNavStyle('glass');
       }
     };
 
@@ -74,7 +73,7 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
           {/* Logo */}
-          <div className="flex-shrink-0 flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo(0,0)}>
+          <div className="flex-shrink-0 flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${logoBg}`}>
               <Building2 className={`w-6 h-6 ${logoIcon}`} />
             </div>
@@ -116,10 +115,10 @@ const Navbar = () => {
             className="md:hidden bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 shadow-xl"
           >
             <div className="px-4 pt-4 pb-6 space-y-3">
-              <Link to="/login" className="block w-full text-center px-4 py-3 border border-slate-700 rounded-lg text-white font-bold hover:bg-slate-800">
+              <Link to="/login" onClick={() => setIsOpen(false)} className="block w-full text-center px-4 py-3 border border-slate-700 rounded-lg text-white font-bold hover:bg-slate-800">
                 Login
               </Link>
-              <Link to="/get-started" className="block w-full text-center px-4 py-3 rounded-lg text-white bg-orange-600 font-bold hover:bg-orange-700 shadow-md">
+              <Link to="/get-started" onClick={() => setIsOpen(false)} className="block w-full text-center px-4 py-3 rounded-lg text-white bg-orange-600 font-bold hover:bg-orange-700 shadow-md">
                 Get Started
               </Link>
             </div>
@@ -179,7 +178,7 @@ const HeroSection = () => {
               <motion.button 
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="w-full sm:w-auto flex items-center justify-center px-8 py-4 text-lg font-bold rounded-lg text-white bg-orange-600 hover:bg-orange-500 shadow-xl shadow-orange-900/30 transition-all"
+                className="w-full sm:w-auto flex items-center justify-center px-8 py-4 text-lg font-bold rounded-lg text-white bg-orange-600 hover:bg-orange-700 shadow-xl shadow-orange-900/30 transition-all"
               >
                 Start Free Trial
                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -258,7 +257,7 @@ const RoleCard = ({ letter, title, description }) => (
   <motion.div 
     variants={fadeInUp}
     whileHover={{ scale: 1.03, y: -5 }}
-    className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all flex flex-col items-center text-center cursor-default"
+    className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all flex flex-col items-center text-center cursor-default group"
   >
     <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4 ring-4 ring-slate-100 group-hover:ring-orange-100 transition-all">
       <span className="text-white text-2xl font-bold">{letter}</span>
@@ -351,17 +350,19 @@ const PricingCard = ({ title, price, frequency, features, isPopular, saveText })
         </li>
       ))}
     </ul>
-    <motion.button 
-      whileHover={{ scale: 1.02 }}
-      whileTap={{ scale: 0.98 }}
-      className={`w-full py-3 px-4 rounded-lg font-bold transition-colors ${
-        isPopular 
-          ? 'bg-slate-900 text-white hover:bg-slate-800' 
-          : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
-      }`}
-    >
-      Select Plan
-    </motion.button>
+    <Link to="/get-started">
+      <motion.button 
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
+        className={`w-full py-3 px-4 rounded-lg font-bold transition-colors ${
+          isPopular 
+            ? 'bg-slate-900 text-white hover:bg-slate-800' 
+            : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
+        }`}
+      >
+        Select Plan
+      </motion.button>
+    </Link>
   </motion.div>
 );
 
@@ -458,7 +459,7 @@ const FooterWithCTA = () => {
             <motion.button 
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-lg text-white bg-orange-600 hover:bg-orange-500 shadow-xl transition-all"
+              className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-lg text-white bg-orange-600 hover:bg-orange-700 shadow-xl transition-all"
             >
               Start Free Trial <ArrowRight className="ml-2 w-5 h-5" />
             </motion.button>
