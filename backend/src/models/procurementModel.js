@@ -22,7 +22,7 @@ class ProcurementModel {
   // 3. Get POs received by a specific Supplier (Supplier View)
   static async getPOsBySupplier(supplierId) {
     const sql = `
-      SELECT po.*, u.email as contractor_email, u.mobile_number 
+      SELECT po.*, u.email as contractor_email
       FROM purchase_orders po
       JOIN users u ON po.contractor_id = u.user_id
       WHERE po.supplier_id = ?

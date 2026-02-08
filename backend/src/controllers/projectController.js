@@ -1,5 +1,5 @@
 const ProjectModel = require('../models/projectModel');
-
+const db = require('../config/db'); // Import DB to fetch parent user
 // Inside src/controllers/projectController.js
 
 exports.createProject = async (req, res) => {
@@ -71,16 +71,47 @@ exports.assignContractor = async (req, res) => {
   }
 };
 
-// 4. List Projects (Dashboard View)
-exports.getMyProjects = async (req, res) => {
-    try {
-        const projects = await ProjectModel.getProjectsByPm(req.userId);
-        res.status(200).json(projects);
-    } catch (error) {
-        res.status(500).json({ message: 'Server Error' });
-    }
-};
+// Inside src/controllers/projectController.js
+// Inside src/controllers/projectController.js
 
+exports.getMyProjects = async (req, res) => {
+  try {
+    let projects = [];
+
+    // Case 1: Project Manager (See projects they created)
+    if (req.userRole === 'Project Manager') {
+      projects = await ProjectModel.getProjectsByPm(req.userId);
+    } 
+    // Case 2: Contractor (See projects ASSIGNED to them)
+    else if (req.userRole === 'Contractor') {
+      projects = await ProjectModel.getAssignedProjectsByContractor(req.userId);
+    }
+    // Case 3: Owner (See all company projects)
+    else if (req.userRole === 'Owner') {
+      const companyId = await ProjectModel.getCompanyIdByUser(req.userId);
+      projects = await ProjectModel.getProjectsByCompany(companyId);
+    }
+    // Case 4: Site Engineer (See projects assigned to their Contractor)
+    else if (req.userRole === 'Site Engineer') {
+      // 1. Find the Contractor who created this Site Engineer
+      const sql = 'SELECT created_by_user_id FROM users WHERE user_id = ?';
+      const [rows] = await db.execute(sql, [req.userId]);
+      
+      if (rows.length > 0) {
+        const parentContractorId = rows[0].created_by_user_id;
+        
+        // 2. Fetch projects assigned to that Parent Contractor
+        // (We reuse the existing method for contractors)
+        projects = await ProjectModel.getAssignedProjectsByContractor(parentContractorId);
+      }
+    }
+
+    res.status(200).json(projects);
+  } catch (error) {
+    console.error("Error in getMyProjects:", error);
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
 // Add this new function
 exports.getOwnerProjects = async (req, res) => {
   try {

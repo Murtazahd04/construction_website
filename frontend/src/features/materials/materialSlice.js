@@ -1,6 +1,21 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
+
+// 1. Add this new Thunk at the top
+export const fetchProjectRequests = createAsyncThunk(
+  'materials/fetchProjectRequests',
+  async ({ projectId, token }, { rejectWithValue }) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      // Assuming backend endpoint: GET /api/materials/project/:projectId
+      const response = await axios.get(`http://localhost:5000/api/materials/project/${projectId}`, config);
+      return response.data;
+    } catch (err) {
+      return rejectWithValue(err.response.data);
+    }
+  }
+);
 // API: POST /api/materials/request
 export const createMaterialRequest = createAsyncThunk(
   'materials/createRequest',
@@ -52,6 +67,9 @@ const materialSlice = createSlice({
       })
       .addCase(fetchMyRequests.fulfilled, (state, action) => {
         state.requests = action.payload;
+      })
+      .addCase(fetchProjectRequests.fulfilled, (state, action) => {
+        state.requests = action.payload; // Updates the requests list with project data
       });
   },
 });

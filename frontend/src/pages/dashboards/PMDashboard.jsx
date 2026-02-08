@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Building } from 'lucide-react'; // Add these icons
 import { useDispatch, useSelector } from 'react-redux';
 import { 
   createProject, 
   fetchProjects, 
   fetchContractors, 
   assignContractor, 
-  fetchProjectTeam, // New Thunk
+  fetchProjectTeam, 
   clearProjectState 
 } from '../../features/projects/projectSlice';
 import { logout } from '../../features/auth/authSlice';
@@ -20,39 +19,52 @@ import {
   LogOut, 
   Briefcase, 
   HardHat, 
-  X 
+  X,
+  MapPin 
 } from 'lucide-react';
 
 const PMDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   
+  // 1. Get Token from Storage
+  const token = localStorage.getItem('token'); 
+  
   // Selectors
   const { projects, contractors, currentProjectTeam, successMessage, error } = useSelector((state) => state.projects);
 
   // Layout State
-  const [activeView, setActiveView] = useState('overview'); // overview, create, assign
-  const [selectedProject, setSelectedProject] = useState(null); // For Modal
+  const [activeView, setActiveView] = useState('overview'); 
+  const [selectedProject, setSelectedProject] = useState(null); 
 
   // Form States
-  const [projectForm, setProjectForm] = useState({ project_name: '', budget: '' ,location: '', 
-    project_type: 'Residential', // Default
+  const [projectForm, setProjectForm] = useState({ 
+    project_name: '', 
+    budget: '' ,
+    location: '', 
+    project_type: 'Residential', 
     start_date: '',
-    end_date: ''});
+    end_date: ''
+  });
   const [assignForm, setAssignForm] = useState({ project_id: '', contractor_id: '' });
 
   // Initial Fetch
   useEffect(() => {
-    dispatch(fetchProjects());
-    dispatch(fetchContractors());
-  }, [dispatch]);
+    if (token) {
+      // 2. PASS TOKEN HERE
+      dispatch(fetchProjects(token));
+      dispatch(fetchContractors(token));
+    } else {
+      navigate('/login');
+    }
+  }, [dispatch, token, navigate]);
 
-const handleCreate = (e) => {
+  const handleCreate = (e) => {
     e.preventDefault();
-    dispatch(createProject(projectForm)).then((res) => {
+    // 3. FIX: Pass object with { data, token }
+    dispatch(createProject({ data: projectForm, token })).then((res) => {
       if (!res.error) {
-        dispatch(fetchProjects());
-        // Reset form
+        dispatch(fetchProjects(token)); // Refresh list
         setProjectForm({ 
           project_name: '', 
           budget: '', 
@@ -68,7 +80,8 @@ const handleCreate = (e) => {
 
   const handleAssign = (e) => {
     e.preventDefault();
-    dispatch(assignContractor(assignForm)).then((res) => {
+    // 4. FIX: Pass object with { data, token }
+    dispatch(assignContractor({ data: assignForm, token })).then((res) => {
       if(!res.error) {
         setAssignForm({ project_id: '', contractor_id: '' });
       }
@@ -77,7 +90,8 @@ const handleCreate = (e) => {
 
   const handleCardClick = (project) => {
     setSelectedProject(project);
-    dispatch(fetchProjectTeam(project.project_id));
+    // 5. FIX: Pass object with { projectId, token }
+    dispatch(fetchProjectTeam({ projectId: project.project_id, token }));
   };
 
   const closeModal = () => {
@@ -89,7 +103,6 @@ const handleCreate = (e) => {
     navigate('/login');
   };
 
-  // Sidebar Component
   const SidebarItem = ({ icon: Icon, label, viewName }) => (
     <button
       onClick={() => { setActiveView(viewName); setSelectedProject(null); }}
@@ -106,7 +119,7 @@ const handleCreate = (e) => {
   return (
     <div className="flex h-screen bg-gray-100">
       
-      {/* 1. SIDEBAR */}
+      {/* SIDEBAR */}
       <aside className="w-64 bg-white shadow-xl z-10 flex flex-col">
         <div className="h-20 flex items-center justify-center border-b border-gray-100">
           <div className="flex items-center gap-2">
@@ -131,10 +144,10 @@ const handleCreate = (e) => {
         </div>
       </aside>
 
-      {/* 2. MAIN CONTENT */}
+      {/* MAIN CONTENT */}
       <main className="flex-1 overflow-y-auto p-8 relative">
         
-        {/* Top Notification Area */}
+        {/* Notifications */}
         {successMessage && (
           <div className="absolute top-4 right-8 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded shadow-lg z-20 flex items-center">
              <span>{successMessage}</span>
@@ -155,7 +168,7 @@ const handleCreate = (e) => {
           </h2>
         </header>
 
-{/* --- VIEW: OVERVIEW (CARD GRID) --- */}
+        {/* --- VIEW: OVERVIEW --- */}
         {activeView === 'overview' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.length > 0 ? (
@@ -169,7 +182,6 @@ const handleCreate = (e) => {
                     <div className="p-3 bg-blue-50 rounded-full group-hover:bg-blue-100 transition-colors">
                       <Briefcase className="w-6 h-6 text-blue-600" />
                     </div>
-                    {/* Show Project Type Badge */}
                     <span className="px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-600 border border-gray-200">
                       {project.project_type}
                     </span>
@@ -179,7 +191,6 @@ const handleCreate = (e) => {
                     {project.project_name}
                   </h3>
                   
-                  {/* Show Location */}
                   <div className="flex items-center text-sm text-gray-500 mb-4">
                     <MapPin className="w-4 h-4 mr-1 text-gray-400" />
                     {project.location || 'No Location'}
@@ -192,7 +203,6 @@ const handleCreate = (e) => {
                 </div>
               ))
             ) : (
-              // ... (Empty state remains same)
               <div className="col-span-full text-center py-20 bg-white rounded-xl border border-dashed border-gray-300">
                   <p className="text-gray-500 text-lg">You haven't created any projects yet.</p>
                   <button onClick={() => setActiveView('create')} className="text-blue-600 font-bold mt-2 hover:underline">
@@ -211,7 +221,6 @@ const handleCreate = (e) => {
             </h3>
             
             <form onSubmit={handleCreate} className="space-y-5">
-              
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <Input 
                   label="Project Name" 
@@ -221,8 +230,6 @@ const handleCreate = (e) => {
                   placeholder="e.g., City Center Mall"
                   required
                 />
-                
-                {/* Project Type Dropdown */}
                 <div>
                   <label className="block text-gray-700 text-sm font-bold mb-2">Project Type</label>
                   <select
@@ -244,7 +251,6 @@ const handleCreate = (e) => {
                   type="number"
                   value={projectForm.budget} 
                   onChange={(e) => setProjectForm({...projectForm, budget: e.target.value})} 
-                  placeholder="e.g., 10000000"
                   required
                 />
                 <Input 
@@ -252,7 +258,6 @@ const handleCreate = (e) => {
                   name="location" 
                   value={projectForm.location} 
                   onChange={(e) => setProjectForm({...projectForm, location: e.target.value})} 
-                  placeholder="e.g., Mumbai, Andheri East"
                   required
                 />
               </div>
@@ -316,7 +321,7 @@ const handleCreate = (e) => {
                   <option value="">-- Choose Contractor --</option>
                   {contractors.map(c => (
                     <option key={c.user_id} value={c.user_id}>
-                      {c.email} — {c.contractor_specialization || 'General'}
+                      {c.email} {c.specialization ? `— ${c.specialization}` : ''}
                     </option>
                   ))}
                 </select>
@@ -329,12 +334,10 @@ const handleCreate = (e) => {
           </div>
         )}
 
-        {/* --- PROJECT DETAILS MODAL --- */}
+        {/* --- MODAL --- */}
         {selectedProject && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
             <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-fade-in-up">
-              
-              {/* Modal Header */}
               <div className="bg-blue-600 p-6 flex justify-between items-start">
                 <div>
                   <h3 className="text-2xl font-bold text-white">{selectedProject.project_name}</h3>
@@ -345,7 +348,6 @@ const handleCreate = (e) => {
                 </button>
               </div>
 
-              {/* Modal Body: Team List */}
               <div className="p-6">
                 <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                   <HardHat className="text-orange-500" /> Assigned Team
@@ -365,37 +367,19 @@ const handleCreate = (e) => {
                               <p className="text-xs text-gray-500">Joined: {new Date(member.assigned_at).toLocaleDateString()}</p>
                             </div>
                           </div>
-                          <span className="px-3 py-1 bg-orange-50 text-orange-700 text-xs font-bold uppercase rounded-full border border-orange-100">
-                            {member.contractor_specialization || 'General'}
-                          </span>
                         </div>
                       ))}
                     </div>
                   ) : (
                     <div className="p-8 text-center text-gray-500">
                       <p>No contractors assigned yet.</p>
-                      <button 
-                        onClick={() => { closeModal(); setActiveView('assign'); }}
-                        className="text-blue-600 font-bold mt-2 hover:underline text-sm"
-                      >
-                        Assign one now
-                      </button>
                     </div>
                   )}
                 </div>
               </div>
-
-              {/* Modal Footer */}
-              <div className="p-4 bg-gray-50 text-right border-t border-gray-100">
-                <button onClick={closeModal} className="px-6 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50">
-                  Close
-                </button>
-              </div>
-
             </div>
           </div>
         )}
-
       </main>
     </div>
   );

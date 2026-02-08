@@ -67,6 +67,19 @@ static async getAssignedContractorsByProject(projectId) {
   const [rows] = await db.execute(sql, [projectId]);
   return rows;
 }
+// Add this new method inside the ProjectModel class
+
+static async getAssignedProjectsByContractor(contractorId) {
+  const sql = `
+    SELECT p.* FROM projects p
+    JOIN project_assignments pa ON p.project_id = pa.project_id
+    WHERE pa.contractor_id = ?
+  `;
+  const [rows] = await db.execute(sql, [contractorId]);
+  return rows;
 }
+}
+
+
 
 module.exports = ProjectModel;

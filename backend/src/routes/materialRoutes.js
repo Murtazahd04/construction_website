@@ -11,4 +11,6 @@ router.post('/request', materialController.createRequest);
 // GET /api/materials/my-requests - View Status
 router.get('/my-requests', materialController.getMyRequests);
 
+// ✅ ADD THIS NEW ROUTE
+router.get('/project/:projectId', verifyToken, materialController.getProjectRequests);
 module.exports = router;

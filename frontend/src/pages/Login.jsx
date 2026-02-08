@@ -27,12 +27,13 @@ const Login = () => {
     // Redirect based on Role
     useEffect(() => {
         if (role) {
-            switch (role) {
+    
+      switch (role) {
                 case 'Owner':
                     navigate('/owner-dashboard');
                     break;
                 case 'Project Manager':
-                    navigate('/pm-dashboard');
+                    navigate('/project-manager-dashboard');
                     break;
                 case 'Contractor':
                     navigate('/contractor-dashboard');
@@ -48,6 +49,9 @@ const Login = () => {
             }
         }
     }, [role, navigate]);
+
+
+    
 
     useEffect(() => {
         if (error) {
