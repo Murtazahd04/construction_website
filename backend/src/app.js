@@ -9,7 +9,10 @@ const userRoutes = require('./src/routes/userRoutes');
 const projectRoutes = require('./src/routes/projectRoutes');
 const reportRoutes = require('./src/routes/reportRoutes');
 const procurementRoutes = require('./src/routes/procurementRoutes');
+// --- ⬇️ ADD THIS SECTION ⬇️ ---
+const adminRoutes = require('./src/routes/adminRoutes'); // Make sure path is correct
 
+// ------------------------------
 // If you have a separate companyRoutes file, import it here. 
 // If company registration is handled inside authRoutes, you can comment this out.
 // const companyRoutes = require('./src/routes/companyRoutes'); 
@@ -36,6 +39,7 @@ app.use('/api/reports', reportRoutes);
 // 5. Procurement: POs & Invoices (Flow 4 & 6)
 app.use('/api/procurement', procurementRoutes);
 
+app.use('/api/admin', adminRoutes);
 // 6. Companies (Optional/Extra)
 // app.use('/api/companies', companyRoutes);
 

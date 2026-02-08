@@ -9,7 +9,7 @@ const projectRoutes = require('./src/routes/projectRoutes');
 const reportRoutes = require('./src/routes/reportRoutes');
 const materialRoutes = require('./src/routes/materialRoutes'); // NEW: Flow 5
 const procurementRoutes = require('./src/routes/procurementRoutes');
-
+const adminRoutes = require('./src/routes/adminRoutes'); // Make sure path is correct
 const app = express();
 
 // --- Middleware ---
@@ -36,6 +36,7 @@ app.use('/api/materials', materialRoutes);
 // 6. Procurement (Flow 4 & 6)
 app.use('/api/procurement', procurementRoutes);
 
+app.use('/api/admin', adminRoutes);
 
 // --- Server Startup ---
 const PORT = process.env.PORT || 5000;

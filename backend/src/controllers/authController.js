@@ -12,6 +12,7 @@ exports.registerCompany = async (req, res) => {
     if (!company_name || !owner_name || !email || !mobile_number) {
       return res.status(400).json({ message: 'All fields are required' });
     }
+    
 
     const registrationId = await CompanyModel.create(req.body);
     

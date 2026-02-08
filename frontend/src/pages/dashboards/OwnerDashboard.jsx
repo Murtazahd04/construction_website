@@ -1,49 +1,79 @@
-import React, { useState, useEffect } from 'react'; // Added useEffect
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { createSubUser, clearUserState } from '../../features/users/userSlice';
-import { fetchOwnerProjects } from '../../features/projects/projectSlice'; // Import new thunk
+import { fetchOwnerProjects } from '../../features/projects/projectSlice';
 import { logout } from '../../features/auth/authSlice';
 import Input from '../../components/common/Input';
 import Button from '../../components/common/Button';
 import { useNavigate } from 'react-router-dom';
-import { Users, Briefcase, LogOut, PlusCircle, LayoutDashboard } from 'lucide-react';
+import { Users, Briefcase, LogOut, LayoutDashboard } from 'lucide-react';
+// 1. IMPORT TOAST
+import { toast } from 'react-toastify';
 
 const OwnerDashboard = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  
-  // Selectors
-  const { loading, error, successMessage, createdCredentials } = useSelector((state) => state.users);
-  const { projects } = useSelector((state) => state.projects); // Get projects from Redux
 
-  const [activeView, setActiveView] = useState('dashboard'); 
+  // Get Token
+  const token = localStorage.getItem('token');
+
+  // Selectors (Added 'error' to the destruction)
+  const { loading, successMessage, error, createdCredentials } = useSelector((state) => state.users);
+  const { projects } = useSelector((state) => state.projects);
+  const { user } = useSelector((state) => state.auth);
+
+  const [activeView, setActiveView] = useState('dashboard');
   const [formData, setFormData] = useState({ email: '', role: 'Project Manager', specialization: '' });
 
-  // FETCH PROJECTS when switching to Dashboard View
+  // --- 2. ADD TOAST EFFECT ---
   useEffect(() => {
-    if (activeView === 'dashboard') {
-      dispatch(fetchOwnerProjects());
+    // Show Success Toast
+    if (successMessage) {
+      toast.success(successMessage);
+      // Note: We do NOT clear state here immediately, 
+      // because we need the inline box to stay visible so the user can copy the password.
     }
-  }, [dispatch, activeView]);
+
+    // Show Error Toast
+    if (error) {
+      toast.error(error);
+      dispatch(clearUserState()); // Clear error immediately after toast
+    }
+  }, [successMessage, error, dispatch]);
+
+  // Fetch Projects Logic
+  useEffect(() => {
+    if (activeView === 'dashboard' && token) {
+      dispatch(fetchOwnerProjects(token)); 
+    }
+  }, [dispatch, activeView, token]);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    dispatch(createSubUser(formData));
+    dispatch(createSubUser({ data: formData, token }));
   };
 
   const handleLogout = () => {
     dispatch(logout());
-    navigate('/login');
+    navigate('/');
   };
+
+  const getCompanyName = () => {
+    if (!user || !user.email) return 'companyname';
+    const domain = user.email.split('@')[1];
+    return domain ? domain.split('.')[0] : 'companyname';
+  };
+
+  const companyName = getCompanyName();
 
   const SidebarItem = ({ icon: Icon, label, viewName }) => (
     <button
       onClick={() => setActiveView(viewName)}
       className={`w-full flex items-center space-x-3 px-6 py-4 text-left transition-all duration-200 border-l-4
-        ${activeView === viewName 
-          ? 'bg-orange-50 border-orange-500 text-orange-700' 
+        ${activeView === viewName
+          ? 'bg-orange-50 border-orange-500 text-orange-700'
           : 'border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900'}`}
     >
       <Icon className={`w-5 h-5 ${activeView === viewName ? 'text-orange-600' : 'text-gray-400'}`} />
@@ -83,10 +113,7 @@ const OwnerDashboard = () => {
         </header>
 
         {activeView === 'dashboard' ? (
-          
-          /* VIEW 1: Active Projects (REAL DATA) */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            
             {projects && projects.length > 0 ? (
               projects.map((project) => (
                 <div key={project.project_id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-lg transition-shadow duration-300">
@@ -94,7 +121,6 @@ const OwnerDashboard = () => {
                     <div className="p-2 bg-blue-50 rounded-lg">
                       <Briefcase className="w-6 h-6 text-blue-600" />
                     </div>
-                    {/* Status is currently hardcoded or needs a DB field. Using 'Active' for now */}
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
                       Active
                     </span>
@@ -103,8 +129,6 @@ const OwnerDashboard = () => {
                   <p className="text-sm text-gray-500 mb-4">
                     Budget: ₹{Number(project.budget).toLocaleString()}
                   </p>
-                  
-                  {/* Progress Bar (Placeholder until we have task tracking) */}
                   <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
                     <div className="bg-orange-500 h-2.5 rounded-full" style={{ width: '0%' }}></div>
                   </div>
@@ -116,14 +140,10 @@ const OwnerDashboard = () => {
                 No projects found. Ask your Project Managers to create one.
               </div>
             )}
-            
           </div>
-
         ) : (
-          /* VIEW 2: Create User Form (Existing code remains same) */
           <div className="max-w-2xl">
             <div className="bg-white p-8 rounded-xl shadow-lg border border-gray-100">
-              {/* ... (Existing Form Code) ... */}
               <div className="flex items-center mb-6">
                 <div className="p-3 bg-orange-100 rounded-full mr-4">
                   <Users className="w-6 h-6 text-orange-600" />
@@ -134,28 +154,48 @@ const OwnerDashboard = () => {
                 </div>
               </div>
 
+              {/* KEEP THIS BOX so users can see the password */}
               {successMessage && (
                 <div className="mb-6 bg-green-50 border-l-4 border-green-500 p-4 rounded-r shadow-sm relative">
                   <p className="text-sm text-green-700 font-bold">{successMessage}</p>
                   {createdCredentials && (
                     <div className="mt-2 text-sm bg-white p-3 rounded border border-green-200">
-                       <p><strong>Email:</strong> {createdCredentials.email}</p>
-                       <p><strong>Password:</strong> {createdCredentials.password}</p>
+                      <p><strong>Email:</strong> {createdCredentials.email}</p>
+                      <p><strong>Password:</strong> {createdCredentials.password}</p>
                     </div>
                   )}
-                  <button onClick={() => dispatch(clearUserState())} className="absolute top-0 right-0 p-2">&times;</button>
+                  <button onClick={() => dispatch(clearUserState())} className="absolute top-0 right-0 p-2 text-gray-500 hover:text-gray-700">&times;</button>
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div>
                   <label className="block text-gray-700 text-sm font-bold mb-2">Select Role</label>
-                  <select name="role" value={formData.role} onChange={handleChange} className="block w-full p-3 border rounded-lg bg-gray-50">
+                  <select
+                    name="role"
+                    value={formData.role}
+                    onChange={handleChange}
+                    className="block w-full p-3 border rounded-lg bg-gray-50"
+                  >
                     <option value="Project Manager">Project Manager</option>
                     <option value="Contractor">Contractor</option>
                   </select>
                 </div>
-                <Input label="User Email" name="email" type="email" value={formData.email} onChange={handleChange} required />
+
+                <Input 
+                  label="User Email" 
+                  name="email" 
+                  type="email" 
+                  value={formData.email} 
+                  onChange={handleChange} 
+                  required 
+                  placeholder={
+                    formData.role === 'Project Manager' 
+                      ? `projectmanager@${companyName}.com` 
+                      : `contractor@${companyName}.com`
+                  }
+                />
+
                 {formData.role === 'Contractor' && (
                   <div>
                     <label className="block text-gray-700 text-sm font-bold mb-2">Specialization</label>

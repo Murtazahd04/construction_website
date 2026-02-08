@@ -14,7 +14,7 @@ import ProjectManagerDashboard from './pages/dashboards/PMDashboard';
 import ContractorDashboard from './pages/ContractorDashboard';
 import SiteEngineerDashboard from './pages/SiteEngineerDashboard';
 import SupplierDashboard from './pages/SupplierDashboard';
-
+import AdminDashboard from './pages/AdminDashboard';
 function App() {
   return (
     <Router>
@@ -32,6 +32,10 @@ function App() {
       />
 
       <Routes>
+       
+        <Route element={<PrivateRoute allowedRoles={['Admin']} />}>
+          <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        </Route>
         {/* ✅ 1. ROOT: Show Landing Page first */}
         <Route path="/" element={<LandingPage />} />
 
