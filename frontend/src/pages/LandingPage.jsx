@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Check, Menu, X, Building2, Users, ClipboardList, 
   Truck, BarChart3, ShieldCheck, ArrowRight,
-  MapPin, Phone, Mail, Facebook, Twitter, Linkedin, Instagram 
+  MapPin, Phone, Mail, Facebook, Twitter, Linkedin, Instagram, XCircle
 } from 'lucide-react';
 
 // --- IMAGE IMPORTS ---
@@ -72,7 +72,6 @@ const Navbar = () => {
     <nav className={`fixed top-0 w-full z-50 transition-all duration-500 ${navClasses}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center">
-          {/* Logo */}
           <div className="flex-shrink-0 flex items-center gap-3 group cursor-pointer" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${logoBg}`}>
               <Building2 className={`w-6 h-6 ${logoIcon}`} />
@@ -80,7 +79,6 @@ const Navbar = () => {
             <span className={`font-bold text-2xl tracking-tight transition-colors ${textClasses}`}>BuildFlow</span>
           </div>
 
-          {/* Desktop Buttons */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/login" className={`font-semibold text-lg transition-colors hover:text-orange-500 ${textClasses}`}>
               Login
@@ -96,7 +94,6 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Mobile menu button */}
           <div className="md:hidden flex items-center">
             <button onClick={() => setIsOpen(!isOpen)} className={`${textClasses} focus:outline-none`}>
               {isOpen ? <X size={28} /> : <Menu size={28} />}
@@ -105,7 +102,6 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile Menu */}
       <AnimatePresence>
         {isOpen && (
           <motion.div 
@@ -135,44 +131,30 @@ const Navbar = () => {
 const HeroSection = () => {
   return (
     <div className="relative bg-slate-900 h-[850px] flex items-center overflow-hidden">
-      {/* Background Image */}
       <motion.div 
         initial={{ scale: 1.2 }}
         animate={{ scale: 1 }}
         transition={{ duration: 1.5, ease: "easeOut" }}
         className="absolute inset-0 z-0"
       >
-        <img 
-          src={bannerImage} 
-          alt="Construction Site" 
-          className="w-full h-full object-cover opacity-50" 
-        />
+        <img src={bannerImage} alt="Construction Site" className="w-full h-full object-cover opacity-50" />
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/60 to-transparent"></div>
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-transparent"></div>
       </motion.div>
 
-      {/* Content */}
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={staggerContainer}
-          className="max-w-3xl"
-        >
+        <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="max-w-3xl">
           <motion.div variants={fadeInUp} className="inline-flex items-center px-3 py-1 rounded border border-orange-500/50 bg-orange-500/20 text-orange-300 text-sm font-bold uppercase tracking-wider mb-6 backdrop-blur-sm">
             <span className="w-2 h-2 rounded-full bg-orange-500 mr-2 animate-pulse"></span>
             Seamless Operations
           </motion.div>
-          
           <motion.h1 variants={fadeInUp} className="text-5xl tracking-tight font-extrabold text-white sm:text-7xl leading-tight drop-shadow-lg">
             Build with <span className="text-white">Precision.</span><br />
             Manage with <span className="text-orange-500">Power.</span>
           </motion.h1>
-          
           <motion.p variants={fadeInUp} className="mt-6 text-xl text-gray-200 leading-relaxed max-w-2xl drop-shadow-md">
             The all-in-one construction management platform engineered for stability. Connect your site engineers, contractors, and suppliers in one secure ecosystem.
           </motion.p>
-          
           <motion.div variants={fadeInUp} className="mt-10 flex flex-col sm:flex-row gap-4">
             <Link to="/get-started">
               <motion.button 
@@ -207,36 +189,14 @@ const FeaturesSection = () => {
   return (
     <div className="bg-slate-50 py-24 relative z-10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center max-w-3xl mx-auto mb-16"
-        >
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-100px" }} transition={{ duration: 0.6 }} className="text-center max-w-3xl mx-auto mb-16">
           <h2 className="text-sm font-bold text-orange-600 tracking-widest uppercase">Operational Excellence</h2>
-          <p className="mt-3 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-            Engineered for Efficiency
-          </p>
-          <p className="mt-4 text-xl text-slate-500">
-            Tools designed to reduce friction and increase visibility across your entire operation.
-          </p>
+          <p className="mt-3 text-3xl font-extrabold text-slate-900 sm:text-4xl">Engineered for Efficiency</p>
+          <p className="mt-4 text-xl text-slate-500">Tools designed to reduce friction and increase visibility across your entire operation.</p>
         </motion.div>
-
-        <motion.div 
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
-        >
+        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
-            <motion.div 
-              key={index}
-              variants={fadeInUp}
-              whileHover={{ y: -8, transition: { duration: 0.2 } }}
-              className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-300 group"
-            >
+            <motion.div key={index} variants={fadeInUp} whileHover={{ y: -8, transition: { duration: 0.2 } }} className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-300 group">
               <div className="w-14 h-14 bg-slate-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-slate-900 transition-colors duration-300">
                 <feature.icon className="text-slate-700 w-7 h-7 group-hover:text-white transition-colors duration-300" />
               </div>
@@ -254,11 +214,7 @@ const FeaturesSection = () => {
 // 4. ROLES SECTION
 // ==============================
 const RoleCard = ({ letter, title, description }) => (
-  <motion.div 
-    variants={fadeInUp}
-    whileHover={{ scale: 1.03, y: -5 }}
-    className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all flex flex-col items-center text-center cursor-default group"
-  >
+  <motion.div variants={fadeInUp} whileHover={{ scale: 1.03, y: -5 }} className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all flex flex-col items-center text-center cursor-default group">
     <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4 ring-4 ring-slate-100 group-hover:ring-orange-100 transition-all">
       <span className="text-white text-2xl font-bold">{letter}</span>
     </div>
@@ -280,27 +236,11 @@ const RolesSection = () => {
   return (
     <div className="bg-white py-24 border-y border-slate-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center max-w-3xl mx-auto mb-16"
-        >
-          <h2 className="text-3xl font-extrabold text-slate-900">
-            Unified Workflow
-          </h2>
-          <p className="mt-4 text-lg text-slate-500">
-            A single source of truth for every stakeholder.
-          </p>
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="text-3xl font-extrabold text-slate-900">Unified Workflow</h2>
+          <p className="mt-4 text-lg text-slate-500">A single source of truth for every stakeholder.</p>
         </motion.div>
-
-        <motion.div 
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
-          className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"
-        >
+        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {roles.map((role, index) => (
             <RoleCard key={index} {...role} />
           ))}
@@ -311,30 +251,26 @@ const RolesSection = () => {
 };
 
 // ==============================
-// 5. PRICING SECTION
+// 5. PRICING SECTION (UPDATED)
 // ==============================
-const PricingCard = ({ title, price, frequency, features, isPopular, saveText }) => (
+const PricingCard = ({ title, price, frequency, features, isPopular, idealFor }) => (
   <motion.div 
     variants={fadeInUp}
     whileHover={{ scale: 1.05 }}
     className={`relative p-8 bg-white rounded-xl flex flex-col transition-all duration-300 ${
       isPopular 
-        ? 'border-2 border-slate-900 shadow-2xl z-10' 
+        ? 'border-2 border-orange-500 shadow-2xl z-10' 
         : 'border border-slate-200 shadow-sm hover:shadow-xl'
     }`}
   >
     {isPopular && (
       <div className="absolute top-0 right-0 -mt-4 px-4 py-1 bg-orange-600 text-white text-xs font-bold uppercase tracking-wider rounded shadow-md">
-        Best Value
+        Most Popular
       </div>
     )}
     <div className="mb-5">
-      <h3 className="text-lg font-bold text-slate-900">{title}</h3>
-      {saveText ? (
-        <p className="mt-2 inline-block text-green-700 text-xs font-bold bg-green-100 px-2 py-1 rounded">{saveText}</p>
-      ) : (
-        <p className="mt-2 text-transparent text-xs h-6 select-none">.</p>
-      )}
+      <h3 className="text-xl font-bold text-slate-900">{title}</h3>
+      <p className="text-slate-500 text-sm font-medium mt-1">Ideal for: {idealFor}</p>
     </div>
     <div className="mb-6 pb-6 border-b border-slate-100">
       <div className="flex items-baseline">
@@ -345,8 +281,17 @@ const PricingCard = ({ title, price, frequency, features, isPopular, saveText })
     <ul className="mb-8 space-y-4 flex-1">
       {features.map((feature, idx) => (
         <li key={idx} className="flex items-start">
-          <Check className="h-5 w-5 text-slate-900 mr-3 flex-shrink-0" />
-          <span className="text-slate-600 text-sm">{feature}</span>
+          {feature.included ? (
+            <Check className="h-5 w-5 text-green-600 mr-3 flex-shrink-0" />
+          ) : (
+            <XCircle className="h-5 w-5 text-red-400 mr-3 flex-shrink-0" />
+          )}
+          <div className="flex flex-col">
+            <span className={`text-sm font-bold ${feature.included ? 'text-slate-900' : 'text-slate-400'}`}>
+              {feature.label}
+            </span>
+            <span className="text-xs text-slate-500">{feature.value}</span>
+          </div>
         </li>
       ))}
     </ul>
@@ -356,8 +301,8 @@ const PricingCard = ({ title, price, frequency, features, isPopular, saveText })
         whileTap={{ scale: 0.98 }}
         className={`w-full py-3 px-4 rounded-lg font-bold transition-colors ${
           isPopular 
-            ? 'bg-slate-900 text-white hover:bg-slate-800' 
-            : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
+            ? 'bg-orange-600 text-white hover:bg-orange-700' 
+            : 'bg-slate-900 text-white hover:bg-slate-800'
         }`}
       >
         Select Plan
@@ -369,51 +314,57 @@ const PricingCard = ({ title, price, frequency, features, isPopular, saveText })
 const PricingSection = () => {
   const plans = [
     {
-      title: "Daily Pass",
+      title: "Single Day Plan",
       price: "9",
       frequency: "/day",
-      features: ["24-Hour Access", "Single Project", "Basic Reports", "Standard Support"],
-      isPopular: false
+      idealFor: "New Users",
+      isPopular: false,
+      features: [
+        { label: "Projects", value: "1 Project", included: true },
+        { label: "Users", value: "Limited Users", included: true },
+        { label: "Progress Reports", value: "Daily Only", included: true },
+        { label: "Budget Tracking", value: "No", included: false },
+        { label: "Purchase Orders", value: "View Only", included: true }
+      ]
     },
     {
-      title: "Professional",
+      title: "Monthly Plan",
       price: "199",
       frequency: "/month",
-      features: ["Full Team Access", "5 Active Projects", "Advanced Analytics", "Inventory Module", "Priority Support"],
-      isPopular: true
+      idealFor: "Growing Teams",
+      isPopular: true,
+      features: [
+        { label: "Projects", value: "Multiple Projects", included: true },
+        { label: "Users", value: "All Roles Enabled", included: true },
+        { label: "Progress Reports", value: "Daily + Weekly", included: true },
+        { label: "Budget Tracking", value: "Basic", included: true },
+        { label: "Purchase Orders", value: "Full Access", included: true }
+      ]
     },
     {
-      title: "Enterprise",
+      title: "Yearly Plan",
       price: "1599",
       frequency: "/year",
-      features: ["Unlimited Projects", "Custom API Access", "Dedicated Account Manager", "SLA Guarantee", "On-site Training"],
+      idealFor: "Established Teams",
       isPopular: false,
-      saveText: "SAVE 33%"
+      features: [
+        { label: "Projects", value: "Unlimited Projects", included: true },
+        { label: "Users", value: "All Roles Enabled", included: true },
+        { label: "Progress Reports", value: "Daily + Weekly + Monthly", included: true },
+        { label: "Budget Tracking", value: "Advanced", included: true },
+        { label: "Purchase Orders", value: "Full Access + History", included: true }
+      ]
     }
   ];
 
   return (
     <div className="bg-slate-50 py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-16"
-        >
-          <h2 className="text-sm font-bold text-orange-600 tracking-widest uppercase">Pricing</h2>
-          <p className="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">
-            Transparent Scaling
-          </p>
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+          <h2 className="text-sm font-bold text-orange-600 tracking-widest uppercase">Pricing Plans</h2>
+          <p className="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl">Optimized for Your Scale</p>
         </motion.div>
-
-        <motion.div 
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
-          className="grid gap-8 lg:grid-cols-3 lg:gap-8 max-w-5xl mx-auto items-center"
-        >
+        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-100px" }} className="grid gap-8 lg:grid-cols-3 lg:gap-8 max-w-6xl mx-auto items-stretch">
           {plans.map((plan, index) => (
             <PricingCard key={index} {...plan} />
           ))}
@@ -429,50 +380,25 @@ const PricingSection = () => {
 const FooterWithCTA = () => {
   return (
     <footer id="footer-section" className="relative bg-slate-900 pt-24 pb-12 overflow-hidden text-slate-300">
-      {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={footerImage} 
-          alt="Footer Background" 
-          className="w-full h-full object-cover opacity-20" 
-        />
+        <img src={footerImage} alt="Footer Background" className="w-full h-full object-cover opacity-20" />
         <div className="absolute inset-0 bg-slate-900/90 mix-blend-multiply"></div>
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* CTA Content */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center mb-20"
-        >
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-            Ready to stabilize your workflow?
-          </h2>
-          <p className="mt-4 text-xl text-slate-400 max-w-2xl mx-auto mb-10">
-            Join the platform built for the demands of modern construction.
-          </p>
-          
+        <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-20">
+          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Ready to stabilize your workflow?</h2>
+          <p className="mt-4 text-xl text-slate-400 max-w-2xl mx-auto mb-10">Join the platform built for the demands of modern construction.</p>
           <Link to="/get-started">
-            <motion.button 
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-lg text-white bg-orange-600 hover:bg-orange-700 shadow-xl transition-all"
-            >
+            <motion.button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-lg text-white bg-orange-600 hover:bg-orange-700 shadow-xl transition-all">
               Start Free Trial <ArrowRight className="ml-2 w-5 h-5" />
             </motion.button>
           </Link>
         </motion.div>
 
-        {/* Separator Line */}
         <div className="border-t border-slate-800 mb-12"></div>
 
-        {/* Expanded Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
-          
-          {/* Column 1: Brand Info */}
           <div>
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-slate-800 border border-slate-700">
@@ -480,9 +406,7 @@ const FooterWithCTA = () => {
               </div>
               <span className="font-bold text-2xl text-white tracking-tight">BuildFlow</span>
             </div>
-            <p className="text-slate-400 text-sm leading-relaxed mb-6">
-              Empowering construction teams with seamless management tools for better efficiency, real-time control, and smarter decision making.
-            </p>
+            <p className="text-slate-400 text-sm leading-relaxed mb-6">Empowering construction teams with seamless management tools for better efficiency, real-time control, and smarter decision making.</p>
             <div className="flex gap-4">
               {[Twitter, Linkedin, Instagram, Facebook].map((Icon, i) => (
                 <a key={i} href="#" className="w-8 h-8 flex items-center justify-center rounded bg-slate-800 hover:bg-orange-600 hover:text-white transition-all text-slate-400">
@@ -492,7 +416,6 @@ const FooterWithCTA = () => {
             </div>
           </div>
 
-          {/* Column 2: Solutions */}
           <div>
             <h3 className="text-white font-bold text-lg mb-6">Solutions</h3>
             <ul className="space-y-4 text-sm">
@@ -502,7 +425,6 @@ const FooterWithCTA = () => {
             </ul>
           </div>
 
-          {/* Column 3: Company */}
           <div>
             <h3 className="text-white font-bold text-lg mb-6">Company</h3>
             <ul className="space-y-4 text-sm">
@@ -512,17 +434,16 @@ const FooterWithCTA = () => {
             </ul>
           </div>
 
-          {/* Column 4: Contact Info */}
           <div>
             <h3 className="text-white font-bold text-lg mb-6">Contact Us</h3>
             <ul className="space-y-4 text-sm">
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-orange-600 shrink-0 mt-0.5" />
-                <span>123 Construction Ave,<br/>Mumbai, India 400001</span>
+                <span>123 BuildFlow company ,<br/>Mumbai, India 400001</span>
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="w-5 h-5 text-orange-600 shrink-0" />
-                <span>+91 98765 43210</span>
+                <span>+91 1234567890</span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-5 h-5 text-orange-600 shrink-0" />
@@ -530,21 +451,16 @@ const FooterWithCTA = () => {
               </li>
             </ul>
           </div>
-
         </div>
 
-        {/* Bottom Copyright Bar */}
         <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-slate-500 text-sm">
-            © 2026 BuildFlow. All rights reserved.
-          </p>
+          <p className="text-slate-500 text-sm">© 2026 BuildFlow. All rights reserved.</p>
           <div className="flex gap-6 mt-4 md:mt-0">
              <Link to="#" className="text-slate-500 hover:text-white text-sm">Privacy</Link>
              <Link to="#" className="text-slate-500 hover:text-white text-sm">Terms</Link>
              <Link to="#" className="text-slate-500 hover:text-white text-sm">Sitemap</Link>
           </div>
         </div>
-
       </div>
     </footer>
   );
