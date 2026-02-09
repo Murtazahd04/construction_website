@@ -174,7 +174,7 @@ const HeroSection = () => {
 };
 
 // ==============================
-// 3. FEATURES SECTION
+// 3. FEATURES SECTION (LOGOS ANIMATION + DYNAMIC COLORS)
 // ==============================
 const FeaturesSection = () => {
   const features = [
@@ -194,13 +194,24 @@ const FeaturesSection = () => {
           <p className="mt-3 text-3xl font-extrabold text-slate-900 sm:text-4xl">Engineered for Efficiency</p>
           <p className="mt-4 text-xl text-slate-500">Tools designed to reduce friction and increase visibility across your entire operation.</p>
         </motion.div>
+        
         <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
-            <motion.div key={index} variants={fadeInUp} whileHover={{ y: -8, transition: { duration: 0.2 } }} className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm hover:shadow-xl hover:border-orange-200 transition-all duration-300 group">
-              <div className="w-14 h-14 bg-slate-100 rounded-lg flex items-center justify-center mb-6 group-hover:bg-slate-900 transition-colors duration-300">
-                <feature.icon className="text-slate-700 w-7 h-7 group-hover:text-white transition-colors duration-300" />
-              </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-orange-600 transition-colors">{feature.title}</h3>
+            <motion.div 
+              key={index} 
+              variants={fadeInUp} 
+              className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm transition-all duration-300 group hover:shadow-2xl hover:shadow-orange-500/20 hover:border-orange-500/30"
+            >
+              <motion.div 
+                animate={{ y: [0, -5, 0] }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: index * 0.2 }}
+                className="w-14 h-14 bg-slate-900 rounded-lg flex items-center justify-center mb-6 transition-all duration-300 group-hover:bg-slate-100"
+              >
+                <feature.icon className="text-white w-7 h-7 transition-colors duration-300 group-hover:text-slate-900" />
+              </motion.div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3 transition-colors duration-300 group-hover:text-orange-600">
+                {feature.title}
+              </h3>
               <p className="text-slate-500 text-base leading-relaxed">{feature.description}</p>
             </motion.div>
           ))}
@@ -211,36 +222,60 @@ const FeaturesSection = () => {
 };
 
 // ==============================
-// 4. ROLES SECTION
+// 4. ROLES SECTION (DYNAMIC COLORS + ORANGE SHADOW)
 // ==============================
 const RoleCard = ({ letter, title, description }) => (
-  <motion.div variants={fadeInUp} whileHover={{ scale: 1.03, y: -5 }} className="bg-white p-6 rounded-lg border border-slate-200 shadow-sm hover:shadow-lg transition-all flex flex-col items-center text-center cursor-default group">
-    <div className="w-16 h-16 bg-slate-900 rounded-full flex items-center justify-center mb-4 ring-4 ring-slate-100 group-hover:ring-orange-100 transition-all">
-      <span className="text-white text-2xl font-bold">{letter}</span>
+  <motion.div 
+    variants={fadeInUp}
+    className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm transition-all duration-300 flex flex-col items-start text-left cursor-default group hover:shadow-2xl hover:shadow-orange-500/20 hover:border-orange-500/30"
+  >
+    <div className="w-14 h-14 bg-slate-900 rounded-lg flex items-center justify-center mb-6 transition-all duration-300 group-hover:bg-slate-100 group-hover:scale-110">
+      <span className="text-white text-xl font-bold transition-colors duration-300 group-hover:text-slate-900">
+        {letter}
+      </span>
     </div>
-    <h3 className="text-lg font-bold text-slate-900 mb-2">{title}</h3>
-    <p className="text-slate-500 text-sm leading-relaxed">{description}</p>
+    
+    <h3 className="text-xl font-bold text-slate-900 mb-3 transition-colors duration-300 group-hover:text-orange-600">
+      {title}
+    </h3>
+    
+    <p className="text-slate-500 text-base leading-relaxed">
+      {description}
+    </p>
   </motion.div>
 );
 
 const RolesSection = () => {
   const roles = [
-    { letter: "O", title: "Owner", description: "Strategic oversight and high-level company management." },
-    { letter: "P", title: "Project Manager", description: "Budget authority and timeline enforcement." },
-    { letter: "C", title: "Contractor", description: "Workforce management and task execution." },
-    { letter: "S", title: "Site Engineer", description: "On-ground technical supervision and reporting." },
-    { letter: "V", title: "Vendor", description: "Supply fulfillment and invoice submission." },
-    { letter: "A", title: "Admin", description: "System configuration and user provisioning." }
+    { letter: "O", title: "Owner", description: "Strategic oversight and high-level company management for executive decision making." },
+    { letter: "P", title: "Project Manager", description: "Budget authority and timeline enforcement across multiple project phases." },
+    { letter: "C", title: "Contractor", description: "Workforce management and task execution specialized for construction delivery." },
+    { letter: "S", title: "Site Engineer", description: "On-ground technical supervision and digital reporting for quality control." },
+    { letter: "V", title: "Vendor", description: "Supply fulfillment, real-time material tracking, and automated invoice submission." },
+    { letter: "A", title: "Admin", description: "System configuration, granular user provisioning, and secure data access management." }
   ];
 
   return (
-    <div className="bg-white py-24 border-y border-slate-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center max-w-3xl mx-auto mb-16">
-          <h2 className="text-3xl font-extrabold text-slate-900">Unified Workflow</h2>
-          <p className="mt-4 text-lg text-slate-500">A single source of truth for every stakeholder.</p>
+    <div className="bg-white py-24 border-y border-slate-50 relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center max-w-2xl mx-auto mb-16"
+        >
+          <h2 className="text-sm font-bold text-orange-600 tracking-widest uppercase mb-2">Team Ecosystem</h2>
+          <p className="text-4xl font-extrabold text-slate-900 mb-4">Unified Workflow</p>
+          <p className="text-lg text-slate-500">Every stakeholder connected in one secure platform.</p>
         </motion.div>
-        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: "-50px" }} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+
+        <motion.div 
+          variants={staggerContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-50px" }}
+          className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3"
+        >
           {roles.map((role, index) => (
             <RoleCard key={index} {...role} />
           ))}
@@ -251,7 +286,7 @@ const RolesSection = () => {
 };
 
 // ==============================
-// 5. PRICING SECTION (UPDATED)
+// 5. PRICING SECTION
 // ==============================
 const PricingCard = ({ title, price, frequency, features, isPopular, idealFor }) => (
   <motion.div 
@@ -334,10 +369,10 @@ const PricingSection = () => {
       idealFor: "Growing Teams",
       isPopular: true,
       features: [
-        { label: "Projects", value: "5 Projects", included: true },
-        { label: "Users", value: "Few Roles Enabled", included: true },
+        { label: "Projects", value: "Multiple Projects", included: true },
+        { label: "Users", value: "All Roles Enabled", included: true },
         { label: "Progress Reports", value: "Daily + Weekly", included: true },
-        { label: "Budget Tracking", value: "No", included: false },
+        { label: "Budget Tracking", value: "Basic", included: true },
         { label: "Purchase Orders", value: "Full Access", included: true }
       ]
     },
