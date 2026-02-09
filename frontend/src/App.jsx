@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -19,38 +19,11 @@ import SiteEngineerDashboard from './pages/dashboards/SiteEngineerDashboard';
 import SupplierDashboard from './pages/dashboards/SupplierDashboard';
 import AdminDashboard from './pages/dashboards/AdminDashboard';
 
-/**
- * RefreshHandler Component
- * Detects if the user has performed a browser refresh.
- * If a refresh is detected, it redirects the user to the landing page.
- */
-const RefreshHandler = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-
-  useEffect(() => {
-    // Check performance entries to identify if the navigation type was a 'reload'
-    const [navigation] = performance.getEntriesByType('navigation');
-    
-    if (navigation && navigation.type === 'reload') {
-      // If we are already at the root, no need to navigate
-      if (location.pathname !== '/') {
-        console.log("System Alert: Browser refresh detected. Redirecting to Entry Point.");
-        navigate('/', { replace: true });
-      }
-    }
-  }, [navigate, location.pathname]);
-
-  return null;
-};
-
 function App() {
   return (
     <Router>
-      {/* Listens for browser refresh events to reset the navigation state */}
-      <RefreshHandler />
-
-      {/* Global Notification System */}
+ 
+     {/* Global Notification System */}
       <ToastContainer
         position="top-right"
         autoClose={3000}
