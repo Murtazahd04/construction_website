@@ -502,9 +502,9 @@ const FooterWithCTA = () => {
   );
 };
 
-// ==============================
+// =============================
 // 7. MAIN PAGE EXPORT
-// ==============================
+// =============================
 const LandingPage = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white text-slate-900">
