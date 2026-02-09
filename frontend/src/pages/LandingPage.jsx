@@ -247,12 +247,13 @@ const RoleCard = ({ letter, title, description }) => (
 
 const RolesSection = () => {
   const roles = [
+    { letter: "A", title: "Admin", description: "System configuration, granular user provisioning, and secure data access management." },
     { letter: "O", title: "Owner", description: "Strategic oversight and high-level company management for executive decision making." },
     { letter: "P", title: "Project Manager", description: "Budget authority and timeline enforcement across multiple project phases." },
     { letter: "C", title: "Contractor", description: "Workforce management and task execution specialized for construction delivery." },
     { letter: "S", title: "Site Engineer", description: "On-ground technical supervision and digital reporting for quality control." },
-    { letter: "V", title: "Vendor", description: "Supply fulfillment, real-time material tracking, and automated invoice submission." },
-    { letter: "A", title: "Admin", description: "System configuration, granular user provisioning, and secure data access management." }
+    { letter: "V", title: "Supplier", description: "Supply fulfillment, real-time material tracking, and automated invoice submission." }
+   
   ];
 
   return (
