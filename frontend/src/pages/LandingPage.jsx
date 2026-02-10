@@ -370,11 +370,11 @@ const PricingSection = () => {
       idealFor: "Growing Teams",
       isPopular: true,
       features: [
-        { label: "Projects", value: "Multiple Projects", included: true },
+        { label: "Projects", value: "5 Projects", included: true },
         { label: "Users", value: "All Roles Enabled", included: true },
         { label: "Progress Reports", value: "Daily + Weekly", included: true },
-        { label: "Budget Tracking", value: "Basic", included: true },
-        { label: "Purchase Orders", value: "Full Access", included: true }
+        { label: "Budget Tracking", value: "no", included: false },
+        { label: "Purchase Orders", value: "Limited Access", included: true }
       ]
     },
     {
