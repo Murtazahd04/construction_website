@@ -1,130 +1,132 @@
-# Construction Management System - Backend API
+# 🏗️ BuildFlow: Enterprise Construction ERP
 
-A complete Node.js & Express backend for managing construction projects, covering the entire lifecycle from company registration to invoice management.
+**BuildFlow** is a high-performance, full-stack Enterprise Resource Planning (ERP) solution designed for the construction industry. Developed to bridge the gap between corporate offices and ground-level sites, it provides a unified ecosystem for project oversight, procurement, and daily progress tracking.
 
-## 🛠️ Tech Stack
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MySQL
-- **Authentication:** JWT (JSON Web Tokens) & Bcrypt
+## 🌟 Key Features
+
+* **Role-Based Access Control (RBAC):** Six specialized dashboards (Admin, Owner, PM, Contractor, Site Engineer, Supplier) ensure data security and operational focus.
+* **Dynamic Industrial UI:** A high-end dark-themed interface featuring glassmorphism effects and fluid animations powered by Framer Motion.
+* **Real-time Site Reporting:** Site Engineers can submit Daily Progress Reports (DPR), track attendance, and log material usage.
+* **Procurement Lifecycle:** End-to-end management of Purchase Orders (PO) and material tracking from request to delivery.
+* **Financial Oversight:** High-level analytics for Owners and PMs to monitor project health and budget adherence.
 
 ---
 
-## 🚀 Setup Instructions
+## 🛠️ Tech Stack
 
-### 1. Install Dependencies
-```bash
-npm install express mysql2 dotenv cors body-parser bcryptjs jsonwebtoken
+### **Frontend**
+
+* **React 18** (Functional Components & Hooks)
+* **Tailwind CSS** (Utility-first styling)
+* **Framer Motion** (Production-grade animations)
+* **Lucide React** (Consistent iconography)
+* **React-Toastify** (Global notification system)
+
+### **Backend**
+
+* **Node.js & Express.js** (Modular REST API)
+* **MySQL** (Relational data management)
+* **JWT (JSON Web Tokens)** (Secure, stateless authentication)
+* **Bcrypt.js** (Password hashing for security)
+
+---
+
+## 📂 Project Structure
+
+```text
+BuildFlow/
+├── frontend/                # React.js Client
+│   ├── src/
+│   │   ├── pages/           # Landing, Login, and Dashboards
+│   │   ├── components/      # PrivateRoutes & UI Elements
+│   │   └── assets/          # Project images (Banner, Footer)
+├── backend/                 # Node.js API
+│   ├── src/
+│   │   ├── routes/          # Auth, Projects, Reports, Procurement
+│   │   ├── controllers/     # Business logic
+│   │   └── models/          # Database queries
+└── .env                     # Environment variables (Internal use)
 
 ```
 
-### 2. Configure Environment Variables
+---
 
-Create a `.env` file in the root directory and add the following:
+## 🚀 Getting Started
+
+### 1. Prerequisites
+
+* Node.js (v16+)
+* MySQL Server
+* NPM or Yarn
+
+### 2. Database Setup
+
+Create a database named `construction_db` in your MySQL environment. You can use the following schema logic for your core tables:
+
+### 3. Environment Configuration
+
+Create a `.env` file in the `backend/` directory:
 
 ```env
 PORT=5000
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_password
+DB_PASSWORD=YOUR_PASSWORD
 DB_NAME=construction_db
-JWT_SECRET=your_super_secret_key
+JWT_SECRET=YOUR_SUPER_SECRET_KEY
 
 ```
 
-### 3. Database Setup
+### 4. Installation
 
-1. Create a MySQL database named `construction_db`.
-2. Run the **Schema SQL Script** (to create tables).
-3. Run the **Foreign Key Script** (to link tables).
-
-### 4. Run the Server
+**Step 1: Install Backend Dependencies**
 
 ```bash
-node server.js
-# OR if using nodemon
+cd backend
+npm install
 npm run dev
 
 ```
 
-Server runs on: `http://localhost:5000`
+**Step 2: Install Frontend Dependencies**
 
----
-
-## 📚 API Documentation (By User Flow)
-
-### 🟢 Flow 1: Company Registration (Public)
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `POST` | `/api/auth/register-company` | Submit "Get Started" form (Status: Pending) |
-| `POST` | `/api/auth/admin/approve-company` | Admin approves company & auto-generates Owner credentials |
-
-### 🔐 Flow 2: Authentication (All Users)
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `POST` | `/api/auth/login` | Login with Email & Password. Returns `token` & `role`. |
-
-### 👤 Flow 2 & 4: User Management
-
-| Method | Endpoint | Access | Description |
-| --- | --- | --- | --- |
-| `POST` | `/api/users/create` | Owner / Contractor | Create sub-users. <br>
-
-<br>Owner creates: `Project Manager`, `Contractor` <br>
-
-<br>Contractor creates: `Site Engineer`, `Supplier` |
-
-### 🏗️ Flow 3: Project Management (Project Manager)
-
-| Method | Endpoint | Description |
-| --- | --- | --- |
-| `POST` | `/api/projects/create` | Create a new project with budget |
-| `GET` | `/api/projects/contractors` | List available contractors for assignment |
-| `POST` | `/api/projects/assign` | Assign a Contractor to a Project |
-| `GET` | `/api/projects/list` | View my projects |
-
-### 👷 Flow 4 & 5: Site Operations (Contractor & Engineer)
-
-| Method | Endpoint | Access | Description |
-| --- | --- | --- | --- |
-| `POST` | `/api/reports` | Site Engineer | Submit Daily Progress Report |
-| `GET` | `/api/reports` | Contractor | View Reports (Filter by `project_id`, `period=day/month/year`, `date`) |
-| `POST` | `/api/materials/request` | Site Engineer | Request materials from Contractor |
-| `GET` | `/api/materials/my-requests` | Site Engineer | Check status of material requests |
-
-### 📦 Flow 6: Procurement (Contractor & Supplier)
-
-| Method | Endpoint | Access | Description |
-| --- | --- | --- | --- |
-| `GET` | `/api/procurement/suppliers` | Contractor | List my created suppliers |
-| `POST` | `/api/procurement/purchase-orders` | Contractor | Create PO & send to Supplier |
-| `GET` | `/api/procurement/my-orders` | Supplier | View received Purchase Orders |
-| `POST` | `/api/procurement/invoices` | Supplier | Upload & submit Invoice for a PO |
-
----
-
-## 🔑 User Roles & Permissions Matrix
-
-| Role | Can Create | Can View |
-| --- | --- | --- |
-| **Owner** | Project Managers, Contractors | All Company Data |
-| **Project Manager** | Projects, Assignments | My Projects |
-| **Contractor** | Site Engineers, Suppliers, POs | Reports, Invoices |
-| **Site Engineer** | Daily Reports, Material Requests | My Requests |
-| **Supplier** | Invoices | Received POs |
-
----
-
-## 🧪 Testing with Postman
-
-1. **Login first:** Send a POST to `/api/auth/login`.
-2. **Copy the Token:** Copy the `token` string from the response.
-3. **Authorize Requests:** In Postman, go to the **Headers** tab for any protected route and add:
-* Key: `Authorization`
-* Value: `Bearer <your_token_here>`
-
-
+```bash
+cd frontend
+npm install
+npm start
 
 ```
+
+---
+
+## 📊 API Reference
+
+| Endpoint | Method | Description |
+| --- | --- | --- |
+| `/api/auth/register-company` | POST | Onboards a new company and admin. |
+| `/api/auth/login` | POST | Authenticates user and returns JWT. |
+| `/api/projects` | GET/POST | Manages project lifecycles. |
+| `/api/reports/dpr` | POST | Submits Daily Progress Reports. |
+| `/api/procurement/po` | POST | Generates Purchase Orders. |
+
+---
+
+## 🔐 Security Features
+
+* **Protected Routes:** Frontend routes are guarded by a `PrivateRoute` component that verifies JWT roles before granting access.
+* **Password Salting:** Sensitive user data is encrypted using 10-round salt Bcrypt hashing.
+* **Input Sanitization:** Express middleware ensures incoming JSON payloads are parsed and validated.
+
+---
+
+## 🎓 Academic Context
+
+This project serves as a capstone for **B.Tech IT (Semester 6)** at **Mumbai University**. It addresses real-world challenges in urban construction management through digital transparency and automated resource tracking.
+
+---
+
+### 📝 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+**Created by Abizer Saify & Murtaza Dhanerwala**

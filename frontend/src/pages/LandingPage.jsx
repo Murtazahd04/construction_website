@@ -350,9 +350,9 @@ const PricingCard = ({ title, price, frequency, features, isPopular, idealFor })
 const PricingSection = () => {
   const plans = [
     {
-      title: "Single Day Plan",
-      price: "9",
-      frequency: "/day",
+      title: "Free Trial Plan",
+      price: "0",
+      frequency: "/ 7  days",
       idealFor: "New Users",
       isPopular: false,
       features: [
