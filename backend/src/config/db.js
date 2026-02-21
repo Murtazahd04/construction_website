@@ -8,17 +8,21 @@ const pool = mysql.createPool({
     database: process.env.DB_NAME,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    // RDS ke liye keepAlive on rakhna achha hota hai
+    enableKeepAlive: true,
+    keepAliveInitialDelay: 0
 });
 
-// Test the connection immediately
-pool.getConnection((err, connection) => {
-    if (err) {
-        console.error('Database connection failed: ' + err.stack);
-        return;
+// Immediate test (Async/Await style)
+(async () => {
+    try {
+        const connection = await pool.getConnection();
+        console.log('✅ Connected to RDS MySQL Database!');
+        connection.release();
+    } catch (err) {
+        console.error('❌ Database connection failed:', err.message);
     }
-    console.log('Connected to MySQL database as ID ' + connection.threadId);
-    connection.release();
-});
+})();
 
 module.exports = pool;
