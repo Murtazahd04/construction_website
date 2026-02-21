@@ -350,9 +350,9 @@ const PricingCard = ({ title, price, frequency, features, isPopular, idealFor })
 const PricingSection = () => {
   const plans = [
     {
-      title: "Single Day Plan",
-      price: "9",
-      frequency: "/day",
+      title: "Free Trial Plan",
+      price: "0",
+      frequency: "/ 7  days",
       idealFor: "New Users",
       isPopular: false,
       features: [
@@ -370,11 +370,11 @@ const PricingSection = () => {
       idealFor: "Growing Teams",
       isPopular: true,
       features: [
-        { label: "Projects", value: "Multiple Projects", included: true },
+        { label: "Projects", value: "5 Projects", included: true },
         { label: "Users", value: "All Roles Enabled", included: true },
         { label: "Progress Reports", value: "Daily + Weekly", included: true },
-        { label: "Budget Tracking", value: "Basic", included: true },
-        { label: "Purchase Orders", value: "Full Access", included: true }
+        { label: "Budget Tracking", value: "no", included: false },
+        { label: "Purchase Orders", value: "Limited Access", included: true }
       ]
     },
     {
@@ -502,9 +502,9 @@ const FooterWithCTA = () => {
   );
 };
 
-// ==============================
+// =============================
 // 7. MAIN PAGE EXPORT
-// ==============================
+// =============================
 const LandingPage = () => {
   return (
     <div className="min-h-screen flex flex-col font-sans bg-white text-slate-900">
