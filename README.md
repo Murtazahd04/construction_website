@@ -41,7 +41,12 @@ BuildFlow/
 │   │   ├── components/      # PrivateRoutes & UI Elements
 │   │   └── assets/          # Project images (Banner, Footer)
 ├── backend/                 # Node.js API
-│   ├── src/
+│   ├── src/::;;:":wr
+
+
+
+
+
 │   │   ├── routes/          # Auth, Projects, Reports, Procurement
 │   │   ├── controllers/     # Business logic
 │   │   └── models/          # Database queries
