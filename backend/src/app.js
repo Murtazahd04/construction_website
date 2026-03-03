@@ -20,7 +20,11 @@ const adminRoutes = require('./src/routes/adminRoutes'); // Make sure path is co
 const app = express();
 
 // --- Middleware ---
-app.use(cors()); // Enable Cross-Origin Resource Sharing
+app.use(cors({
+    origin: "https://construction-website-cyan-zeta.vercel.app", // Your Vercel URL
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true
+}));
 app.use(express.json()); // Parse incoming JSON requests
 
 // --- Route Registration ---
