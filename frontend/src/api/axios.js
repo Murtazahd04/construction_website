@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api', // Matches your backend port
+  baseURL: 'https://construction-website-vgvh.onrender.com/api', // Matches your backend port
   headers: {
     'Content-Type': 'application/json',
   },
